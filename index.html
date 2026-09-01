@@ -1,17 +1,16 @@
 <!doctype html>
 <html lang="pt-BR">
-	<head>
-		<meta charset="utf-8"/>
-		<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
-		<meta name="theme-color" content="#050507"/>
-		<title>Jogo da Música — Multiplayer</title>
-		<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"/>
-		<style>
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<meta name="theme-color" content="#050507"/>
+<title>Jogo da Música — Multiplayer</title>
+<style>
 :root{--bg:#050507;--panel:#0d0d12;--panel2:#12121a;--line:rgba(255,255,255,.09);--text:#f7f7fb;--muted:#9798a3;--soft:#d7d7df;--pink:#ff3cac;--purple:#7c4dff;--cyan:#22d3ee;--green:#4ade80;--red:#fb7185;--yellow:#f59e0b;--shadow:0 24px 80px rgba(0,0,0,.46)}
 *{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}body{overflow-x:hidden}button,input,select{font:inherit}button{cursor:pointer}
 .bg{position:fixed;inset:0;z-index:-2;overflow:hidden;background:radial-gradient(850px 520px at 8% 8%,rgba(255,60,172,.17),transparent 62%),radial-gradient(760px 560px at 92% 12%,rgba(124,77,255,.16),transparent 63%),radial-gradient(900px 600px at 52% 112%,rgba(34,211,238,.08),transparent 60%),#050507}.bg:before,.bg:after{content:"";position:absolute;border-radius:50%;opacity:.17}.bg:before{width:44vw;height:44vw;left:-12vw;top:34vh;background:conic-gradient(from 40deg,transparent,var(--pink),transparent 55%,var(--purple));animation:drift 18s ease-in-out infinite}.bg:after{width:34vw;height:34vw;right:-8vw;bottom:6vh;background:conic-gradient(from 160deg,transparent,var(--cyan),transparent 55%,var(--purple));animation:drift2 22s ease-in-out infinite}@keyframes drift{50%{transform:translate(12vw,-6vh) rotate(80deg) scale(1.12)}}@keyframes drift2{50%{transform:translate(-10vw,-8vh) rotate(-75deg) scale(.92)}}
-.app{min-height:100vh}.topbar{height:72px;border-bottom:1px solid var(--line);background:rgba(4,4,7,.74);backdrop-filter:blur(18px);display:flex;align-items:center;justify-content:space-between;padding:0 22px;position:sticky;top:0;z-index:20}.brand{display:flex;align-items:center;gap:12px;font-weight:850;letter-spacing:-.03em}.brand-mark{width:36px;height:36px;border-radius:12px;background:linear-gradient(135deg,var(--pink),var(--purple));display:grid;place-items:center;box-shadow:0 0 35px rgba(255,60,172,.25)}.brand-mark:before{content:"♫";font-size:22px}.brand small{display:block;color:var(--muted);font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase}.top-actions{display:flex;gap:7px}.ghost{background:transparent;color:var(--soft);padding:9px 12px;border-radius:11px;border:1px solid transparent}.ghost:hover{background:rgba(255,255,255,.05);border-color:var(--line)}
-.main{width:min(1180px,calc(100% - 30px));margin:0 auto;padding:32px 0 56px}.screen{display:none}.screen.active{display:block}.hero{min-height:calc(100vh - 72px);display:grid;place-items:center}.hero-card{width:min(780px,100%);text-align:center;padding:30px 0}.eyebrow{font-size:11px;color:var(--pink);font-weight:850;text-transform:uppercase;letter-spacing:.18em}.title{font-size:clamp(54px,10vw,100px);line-height:.9;letter-spacing:-.075em;margin:18px 0 18px;background:linear-gradient(90deg,#fff 18%,#f4b6ff 52%,#fff 82%);background-size:200% auto;-webkit-background-clip:text;background-clip:text;color:transparent;animation:shine 8s linear infinite}@keyframes shine{to{background-position:200% center}}.subtitle{max-width:650px;margin:0 auto 28px;color:#aaaab4;font-size:17px;line-height:1.5}.pill-row{display:flex;justify-content:center;flex-wrap:wrap;gap:9px;margin:18px 0 27px}.pill{border:1px solid var(--line);background:rgba(255,255,255,.03);padding:8px 11px;border-radius:999px;font-size:12px;color:#c7c7cf}.card{background:linear-gradient(180deg,rgba(19,19,27,.92),rgba(10,10,14,.94));border:1px solid var(--line);border-radius:22px;padding:20px;box-shadow:var(--shadow)}.grid{display:grid;gap:13px}.grid-2{grid-template-columns:repeat(2,minmax(0,1fr))}.grid-3{grid-template-columns:repeat(3,minmax(0,1fr))}@media(max-width:840px){.grid-2,.grid-3{grid-template-columns:1fr}.main{width:min(100% - 18px,1180px);padding-top:18px}.topbar{padding:0 11px}.topbar .ghost span{display:none}.bar-row{grid-template-columns:100px 1fr 30px!important}}
+.app{min-height:100vh}.screen.active{display:block!important}.topbar{height:72px;border-bottom:1px solid var(--line);background:rgba(4,4,7,.74);backdrop-filter:blur(18px);display:flex;align-items:center;justify-content:space-between;padding:0 22px;position:sticky;top:0;z-index:20}.brand{display:flex;align-items:center;gap:12px;font-weight:850;letter-spacing:-.03em}.brand-mark{width:36px;height:36px;border-radius:12px;background:linear-gradient(135deg,var(--pink),var(--purple));display:grid;place-items:center;box-shadow:0 0 35px rgba(255,60,172,.25)}.brand-mark:before{content:"♫";font-size:22px}.brand small{display:block;color:var(--muted);font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase}.top-actions{display:flex;gap:7px}.ghost{background:transparent;color:var(--soft);padding:9px 12px;border-radius:11px;border:1px solid transparent}.ghost:hover{background:rgba(255,255,255,.05);border-color:var(--line)}
+.main{width:min(1180px,calc(100% - 30px));margin:0 auto;padding:32px 0 56px}.screen{display:none}.screen.active{display:block!important}.hero{min-height:calc(100vh - 72px);display:grid;place-items:center}.hero-card{width:min(780px,100%);text-align:center;padding:30px 0}.eyebrow{font-size:11px;color:var(--pink);font-weight:850;text-transform:uppercase;letter-spacing:.18em}.title{font-size:clamp(54px,10vw,100px);line-height:.9;letter-spacing:-.075em;margin:18px 0 18px;background:linear-gradient(90deg,#fff 18%,#f4b6ff 52%,#fff 82%);background-size:200% auto;-webkit-background-clip:text;background-clip:text;color:transparent;animation:shine 8s linear infinite}@keyframes shine{to{background-position:200% center}}.subtitle{max-width:650px;margin:0 auto 28px;color:#aaaab4;font-size:17px;line-height:1.5}.pill-row{display:flex;justify-content:center;flex-wrap:wrap;gap:9px;margin:18px 0 27px}.pill{border:1px solid var(--line);background:rgba(255,255,255,.03);padding:8px 11px;border-radius:999px;font-size:12px;color:#c7c7cf}.card{background:linear-gradient(180deg,rgba(19,19,27,.92),rgba(10,10,14,.94));border:1px solid var(--line);border-radius:22px;padding:20px;box-shadow:var(--shadow)}.grid{display:grid;gap:13px}.grid-2{grid-template-columns:repeat(2,minmax(0,1fr))}.grid-3{grid-template-columns:repeat(3,minmax(0,1fr))}@media(max-width:840px){.grid-2,.grid-3{grid-template-columns:1fr}.main{width:min(100% - 18px,1180px);padding-top:18px}.topbar{padding:0 11px}.topbar .ghost span{display:none}.bar-row{grid-template-columns:100px 1fr 30px!important}}
 .field{display:flex;flex-direction:column;gap:7px;text-align:left}.field label{font-size:11px;color:#a6a6b0;font-weight:750;letter-spacing:.03em}.field input,.field select{width:100%;border:1px solid var(--line);background:#08080c;color:var(--text);border-radius:12px;padding:12px 13px;outline:none}.field input:focus,.field select:focus{border-color:rgba(255,60,172,.55);box-shadow:0 0 0 4px rgba(255,60,172,.08)}.btn{padding:12px 16px;border-radius:12px;border:0;background:linear-gradient(135deg,var(--pink),var(--purple));color:#fff;font-weight:850;box-shadow:0 12px 33px rgba(124,77,255,.2);transition:.16s}.btn:hover{filter:brightness(1.08);transform:translateY(-1px)}.btn.secondary{background:rgba(255,255,255,.05);border:1px solid var(--line);box-shadow:none}.btn.danger{background:rgba(251,113,133,.12);border:1px solid rgba(251,113,133,.2);color:#ffbbc6;box-shadow:none}.btn.good{background:rgba(74,222,128,.11);border:1px solid rgba(74,222,128,.23);color:#b8ffd1;box-shadow:none}.btn:disabled{opacity:.42;cursor:not-allowed;transform:none}.actions{display:flex;gap:9px;flex-wrap:wrap;align-items:center}.actions.right{justify-content:flex-end}.actions.center{justify-content:center}.spacer{height:9px}.tiny{font-size:12px;color:var(--muted)}.muted{color:var(--muted)}.notice{padding:11px 13px;border-radius:12px;background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.22);color:#e7cf9d;font-size:13px}.success{padding:11px 13px;border-radius:12px;background:rgba(74,222,128,.06);border:1px solid rgba(74,222,128,.22);color:#b9f5cb;font-size:13px}.hr{height:1px;background:var(--line);margin:18px 0}.hidden{display:none!important}
 .status{display:flex;justify-content:space-between;align-items:end;gap:15px;flex-wrap:wrap;margin-bottom:14px}.section-title{font-size:20px;font-weight:850;letter-spacing:-.03em;margin:4px 0}.timer{font-variant-numeric:tabular-nums;font-size:38px;font-weight:950;letter-spacing:-.06em}.timer.low{color:var(--red)}.timer small{font-size:10px;letter-spacing:.12em;color:var(--muted);margin-left:5px}.progress{height:6px;background:#17171e;border-radius:999px;overflow:hidden}.progress>div{height:100%;width:100%;background:linear-gradient(90deg,var(--pink),var(--purple),var(--cyan));transition:width 1s linear}.player-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:11px;margin-top:14px}.player-btn{position:relative;min-height:110px;padding:15px;border-radius:18px;border:1px solid var(--line);background:rgba(255,255,255,.03);color:#fff;text-align:left;transition:.17s}.player-btn:hover{transform:translateY(-2px);background:rgba(255,255,255,.055)}.player-btn.selected{border-color:rgba(255,60,172,.83);background:linear-gradient(145deg,rgba(255,60,172,.18),rgba(124,77,255,.13));box-shadow:0 14px 38px rgba(255,60,172,.13)}.player-btn .num{color:#7d7e88;font-size:10px;font-weight:800}.player-btn .name{display:block;margin-top:21px;font-size:18px;font-weight:850}.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:11px;margin-bottom:13px}@media(max-width:840px){.kpis{grid-template-columns:repeat(2,1fr)}}.kpi{padding:15px;border-radius:16px;border:1px solid var(--line);background:rgba(255,255,255,.025)}.kpi .v{font-size:28px;font-weight:950;letter-spacing:-.05em}.kpi .l{font-size:10px;color:#8b8c96;text-transform:uppercase;letter-spacing:.1em;margin-top:4px}.admin-nav{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:17px}.admin-tab{padding:10px 12px;border-radius:10px;color:#aaaab2;background:transparent;border:1px solid transparent}.admin-tab.active{color:#fff;background:rgba(255,255,255,.05);border-color:var(--line)}
 .table-wrap{overflow:auto;border:1px solid var(--line);border-radius:15px}.table{width:100%;border-collapse:collapse;min-width:740px}.table th,.table td{padding:11px 12px;border-bottom:1px solid var(--line);text-align:left;font-size:13px}.table th{color:#888995;font-size:10px;text-transform:uppercase;letter-spacing:.1em}.table tr:last-child td{border-bottom:0}.tag{display:inline-flex;padding:4px 7px;border:1px solid var(--line);background:rgba(255,255,255,.035);border-radius:999px;font-size:11px;color:#c8c8d0}.song-preview{display:flex;gap:12px;align-items:center}.song-preview img{width:64px;height:64px;object-fit:cover;border-radius:12px;border:1px solid var(--line)}
@@ -21,290 +20,70 @@
 .connection-badge{display:inline-flex;align-items:center;gap:7px;padding:6px 9px;border:1px solid var(--line);border-radius:999px;color:#bdbdc5;font-size:11px;background:rgba(255,255,255,.03)}.dot{width:7px;height:7px;border-radius:50%;background:#777}.dot.on{background:var(--green);box-shadow:0 0 10px rgba(74,222,128,.5)}.dot.off{background:var(--red)}
 .share-canvas{display:none}
 </style>
-	</head>
-	<body>
-		<div class="bg"/>
-		<div class="app">
-			<header class="topbar">
-				<div class="brand">
-					<div class="brand-mark"/>
-					<div>Jogo da Música<small>multiplayer • edição anual</small>
-					</div>
-				</div>
-				<div class="top-actions">
-					<button class="ghost" id="homeBtn">⌂ <span>Início</span>
-					</button>
-					<button class="ghost" id="configBtn">⚙ <span>Conexão</span>
-					</button>
-					<button class="ghost" id="adminBtn">♟ <span>Administrador</span>
-					</button>
-				</div>
-			</header>
-			<main class="main">
-				<section id="homeScreen" class="screen active">
-					<div class="hero">
-						<div class="hero-card">
-							<div class="eyebrow">Descubra quem ouviu o quê</div>
-							<h1 class="title">Jogo da<br/>Música</h1>
-							<p class="subtitle">Entre na sala, espere a música tocar e descubra de quem ela é. Sem título, sem artista, sem spoiler.</p>
-							<div class="pill-row">
-								<span class="pill">30s por rodada</span>
-								<span class="pill">votos sincronizados</span>
-								<span class="pill">ranking ao vivo</span>
-								<span class="connection-badge">
-									<i class="dot" id="connDot"/>
-									<span id="connText">não configurado</span>
-								</span>
-							</div>
-							<div class="card" style="max-width:540px;margin:0 auto">
-								<div class="grid grid-2">
-									<div class="field">
-										<label>CÓDIGO DA SALA</label>
-										<input id="roomCode" maxlength="5" placeholder="Ex.: 7F82K" autocapitalize="characters"/>
-									</div>
-									<div class="field">
-										<label>SEU NOME</label>
-										<input id="playerName" maxlength="24" placeholder="Ex.: Pedro" autocomplete="off"/>
-									</div>
-								</div>
-								<div class="spacer"/>
-								<button class="btn" id="joinBtn" style="width:100%">Entrar na sala →</button>
-								<div class="tiny" style="margin-top:10px">O código é criado pelo administrador. Cada aparelho mantém sua própria sessão de jogador.</div>
-							</div>
-						</div>
-					</div>
-				</section>
-				<section id="playerScreen" class="screen">
-					<div class="status">
-						<div>
-							<div class="eyebrow" id="pEyebrow">SALA</div>
-							<div class="section-title" id="pRoundTitle">Conectando…</div>
-							<div class="tiny" id="pMsg"/>
-						</div>
-						<div style="text-align:right">
-							<div class="timer" id="pTimer">—<small>AGUARDE</small>
-							</div>
-						</div>
-					</div>
-					<div class="progress">
-						<div id="pProgress"/>
-					</div>
-					<div class="spacer"/>
-					<div id="pLobby" class="card">
-						<div class="eyebrow">LOBBY</div>
-						<div class="section-title" style="font-size:29px">Quem está na sala?</div>
-						<p class="muted">A lista atualiza automaticamente para todos.</p>
-						<div id="pLobbyPlayers" class="player-list"/>
-					</div>
-					<div id="pVote" class="card hidden">
-						<div class="eyebrow">QUEM É O DONO?</div>
-						<div class="section-title" style="font-size:29px">Escolha uma pessoa</div>
-						<p class="muted">Você não verá o título, o artista ou a resposta.</p>
-						<div id="pVotePlayers" class="player-list"/>
-						<div class="actions" style="justify-content:space-between;margin-top:17px">
-							<div class="tiny" id="pVoteState">Nenhum voto</div>
-							<button class="btn secondary" id="pConfirm" disabled>Confirmar voto< button>< div>< div>
-							<div id="pWait" class="card hidden" style="text-align:center;padding:52px 18px">
-								<div class="eyebrow">VOTO REGISTRADO</div>
-								<div class="big-number pulse" style="font-size:88px">✓</div>
-								<div class="section-title" style="font-size:26px">Agora é com a turma.</div>
-								<p class="muted">Aguarde o encerramento desta rodada.</p>
-							</div>
-							<div id="pResults" class="hidden"/>
-							<div id="pFinal" class="hidden"/>
-						</section>
-						<section id="adminScreen" class="screen">
-							<div class="status">
-								<div>
-									<div class="eyebrow">PAINEL DO JUIZ</div>
-									<div class="section-title" style="font-size:28px" id="aTitle">Administrador</div>
-									<div class="tiny" id="aSubtitle">Nenhuma sala selecionada.</div>
-								</div>
-								<div class="actions">
-									<button class="btn secondary" id="copyRoom">Copiar código</button>
-									<button class="btn danger" id="leaveAdmin">Sair</button>
-								</div>
-							</div>
-							<div class="kpis">
-								<div class="kpi">
-									<div class="v" id="kPlayers">0</div>
-									<div class="l">jogadores</div>
-								</div>
-								<div class="kpi">
-									<div class="v" id="kSongs">0</div>
-									<div class="l">músicas</div>
-								</div>
-								<div class="kpi">
-									<div class="v" id="kUsed">0</div>
-									<div class="l">tocadas</div>
-								</div>
-								<div class="kpi">
-									<div class="v" id="kVotes">0</div>
-									<div class="l">votos</div>
-								</div>
-							</div>
-							<div class="admin-nav">
-								<button class="admin-tab active" data-tab="control">Controle</button>
-								<button class="admin-tab" data-tab="players">Jogadores</button>
-								<button class="admin-tab" data-tab="songs">Músicas</button>
-								<button class="admin-tab" data-tab="ranking">Final</button>
-							</div>
-							<div id="tab-control" class="tab-pane">
-								<div class="grid grid-2">
-									<div class="card">
-										<div class="eyebrow">RODADA ATUAL</div>
-										<div class="section-title" style="font-size:29px" id="aRound">Nenhuma rodada</div>
-										<p class="muted" id="aRoundMsg">Selecione a próxima música.</p>
-										<div class="spacer"/>
-										<div class="actions">
-											<button class="btn" id="startBtn">Iniciar rodada</button>
-											<button class="btn secondary" id="plus15">+15s</button>
-											<button class="btn danger" id="endBtn">Encerrar rodada</button>
-											<button class="btn secondary" id="forceReveal">Pular espera</button>
-										</div>
-										<div class="spacer"/>
-										<div class="timer" id="aTimer">—<small>AGUARDE</small>
-										</div>
-										<div class="progress">
-											<div id="aProgress"/>
-										</div>
-										<div class="tiny" style="margin-top:10px">A música exibida aqui é privada do administrador.</div>
-									</div>
-									<div class="card">
-										<div class="eyebrow">PRÓXIMA MÚSICA</div>
-										<div class="section-title" style="font-size:23px">Escolha o que está tocando</div>
-										<div class="field" style="margin-top:13px">
-											<label>MÚSICA</label>
-											<select id="songSelect"/>
-										</div>
-										<div id="aSongPreview" style="margin-top:14px"/>
-									</div>
-								</div>
-								<div class="card" style="margin-top:13px">
-									<div class="eyebrow">RESULTADO</div>
-									<div id="aResult" class="muted">Nenhum resultado disponível.</div>
-								</div>
-							</div>
-							<div id="tab-players" class="tab-pane hidden">
-								<div class="card">
-									<div class="eyebrow">PARTICIPANTES</div>
-									<div class="section-title" style="font-size:25px">Jogadores conectados</div>
-									<p class="muted">A lista atualiza em tempo real.</p>
-									<div class="hr"/>
-									<div id="aPlayersTable"/>
-								</div>
-							</div>
-							<div id="tab-songs" class="tab-pane hidden">
-								<div class="card">
-									<div class="eyebrow">ESCOPO MUSICAL</div>
-									<div class="section-title" style="font-size:25px">Músicas da partida</div>
-									<div class="grid grid-3" style="margin-top:13px">
-										<div class="field">
-											<label>TÍTULO</label>
-											<input id="sTitle" placeholder="Música"/>
-											<div class="field">
-												<label>ARTISTA</label>
-												<input id="sArtist" placeholder="Artista"/>
-												<div class="field">
-													<label>DONO</label>
-													<input id="sOwner" placeholder="Pessoa"/>
-												</div>
-												<div class="grid grid-2" style="margin-top:11px">
-													<div class="field">
-														<label>CAPA (URL)</label>
-														<input id="sArt" placeholder="https://..."/>
-														<div class="field">
-															<label>SPOTIFY (URL)</label>
-															<input id="sSpotify" placeholder="https://open.spotify.com/track/..."/>
-														</div>
-													</div>
-													<div class="actions" style="margin-top:12px">
-														<button class="btn" id="addSong">Adicionar música</button>
-														<button class="btn secondary" id="importBtn">Importar CSV</button>
-														<input type="file" id="csvFile" accept=".csv,text/csv" hidden>< div><div class="hr"/>
-														<div id="aSongsTable"/>
-													</div>
-												</div>
-												<div id="tab-ranking" class="tab-pane hidden">
-													<div class="card">
-														<div class="eyebrow">FINAL DA PARTIDA</div>
-														<div class="section-title" style="font-size:25px">Ranking e encerramento</div>
-														<p class="muted">Só habilite quando todas as músicas tiverem sido tocadas.</p>
-														<div class="actions" style="margin:13px 0">
-															<button class="btn danger" id="endGameBtn">Encerrar partida</button>
-															<button class="btn" id="nextRankBtn">Revelar próxima colocação</button>
-															<button class="btn secondary" id="exportImgBtn">Exportar imagem</button>
-														</div>
-														<div id="rankAdmin"/>
-													</div>
-												</div>
-											</section>
-										</main>
-									</div>
-									<div class="modal" id="configModal">
-										<div class="modal-card">
-											<div class="eyebrow">CONEXÃO</div>
-											<h2 style="margin:6px 0 7px">Conectar ao Supabase</h2>
-											<p class="muted">Cole a Project URL e a Publishable/anon key do seu projeto. Esses dados podem ficar no navegador; nunca use a service_role key.</p>
-											<div class="field">
-												<label>PROJECT URL</label>
-												<input id="sbUrl" placeholder="https://xjkzichxwicrsnypbgxi.supabase.co"/>
-												<div class="field" style="margin-top:10px">
-													<label>PUBLISHABLE / ANON KEY</label>
-													<input id="sbKey" placeholder="sb_publishable_LAPoiUr9RKn9jwIv90tFvw_O7ubV6NV" autocomplete="off"/>
-													<div class="actions" style="margin-top:14px">
-														<button class="btn" id="saveConfig">Conectar</button>
-														<button class="btn secondary" id="closeConfig">Cancelar</button>
-													</div>
-													<div id="configMsg" class="tiny" style="margin-top:10px"/>
-												</div>
-											</div>
-											<div class="modal" id="adminModal">
-												<div class="modal-card">
-													<div class="eyebrow">ADMINISTRADOR</div>
-													<h2 style="margin:6px 0 7px">Entrar ou criar uma sala</h2>
-													<div class="field">
-														<label>OPÇÃO</label>
-														<select id="adminMode">
-															<option value="create">Criar nova sala</option>
-															<option value="existing">Entrar na sala existente</option>
-														</select>
-													</div>
-													<div class="field" id="adminCodeWrap" style="margin-top:10px">
-														<label>CÓDIGO DA SALA</label>
-														<input id="adminCode" maxlength="5" placeholder="Ex.: 7F82K"/>
-													</div>
-													<div class="field" style="margin-top:10px">
-														<label>SENHA ADMINISTRATIVA</label>
-														<input id="adminPassword" type="password" autocomplete="off" placeholder="Senha da partida"/>
-														<div class="field" id="adminTitleWrap" style="margin-top:10px">
-															<label>NOME DA PARTIDA</label>
-															<input id="adminTitle" value="Jogo da Música — edição anual" maxlength="70"/>
-														</div>
-														<div class="actions" style="margin-top:14px">
-															<button class="btn" id="adminGo">Continuar</button>
-															<button class="btn secondary" id="closeAdmin">Cancelar</button>
-														</div>
-														<div id="adminMsg" class="tiny" style="margin-top:10px"/>
-													</div>
-												</div>
-												<div class="modal" id="confirmEndModal">
-													<div class="modal-card">
-														<div class="eyebrow">DUPLA VERIFICAÇÃO</div>
-														<h2 style="margin:6px 0">Encerrar a partida?</h2>
-														<p class="muted">Depois disso, o jogo entra no ranking final e você não poderá iniciar novas rodadas. Para confirmar, marque a caixa e digite <b>ENCERRAR</b>.</p>
-														<label style="display:flex;gap:9px;align-items:center;font-size:13px;color:#ddd">
-															<input type="checkbox" id="endCheck"> Eu conferi que todas as músicas foram tocadas.</label>
-															<div class="field" style="margin-top:12px">
-																<label>CONFIRMAÇÃO</label>
-																<input id="endPhrase" placeholder="ENCERRAR" autocomplete="off"/>
-																<div class="actions" style="margin-top:14px">
-																	<button class="btn danger" id="confirmEndGame" disabled>Encerrar definitivamente< button><button class="btn secondary" id="cancelEndGame">Voltar</button>
-																</div>
-															</div>
-														</div>
-														<canvas id="shareCanvas" class="share-canvas" width="1600" height="2000"/>
-														<script>
+</head>
+<body>
+<div class="bg"></div>
+<div class="app">
+<header class="topbar">
+  <div class="brand"><div class="brand-mark"></div><div>Jogo da Música<small>multiplayer • edição anual</small></div></div>
+  <div class="top-actions">
+    <button class="ghost" id="homeBtn">⌂ <span>Início</span></button>
+    <button class="ghost" id="configBtn">⚙ <span>Conexão</span></button>
+    <button class="ghost" id="adminBtn">♟ <span>Administrador</span></button>
+  </div>
+</header>
+<main class="main">
+<div id="fatalError" class="notice hidden" style="margin-bottom:14px;text-align:center"></div>
+<section id="homeScreen" class="screen active">
+  <div class="hero"><div class="hero-card">
+    <div class="eyebrow">Descubra quem ouviu o quê</div>
+    <h1 class="title">Jogo da<br/>Música</h1>
+    <p class="subtitle">Entre na sala, espere a música tocar e descubra de quem ela é. Sem título, sem artista, sem spoiler.</p>
+    <div class="pill-row"><span class="pill">30s por rodada</span><span class="pill">votos sincronizados</span><span class="pill">ranking ao vivo</span><span class="connection-badge"><i class="dot" id="connDot"></i><span id="connText">não configurado</span></span></div>
+    <div class="card" style="max-width:540px;margin:0 auto">
+      <div class="grid grid-2">
+        <div class="field"><label>CÓDIGO DA SALA</label><input id="roomCode" maxlength="5" placeholder="Ex.: 7F82K" autocapitalize="characters" /></div>
+        <div class="field"><label>SEU NOME</label><input id="playerName" maxlength="24" placeholder="Ex.: Pedro" autocomplete="off" /></div>
+      </div>
+      <div class="spacer"></div><button class="btn" id="joinBtn" style="width:100%">Entrar na sala →</button>
+      <div class="tiny" style="margin-top:10px">O código é criado pelo administrador. Cada aparelho mantém sua própria sessão de jogador.</div>
+    </div>
+  </div></div>
+</section>
+
+<section id="playerScreen" class="screen">
+  <div class="status"><div><div class="eyebrow" id="pEyebrow">SALA</div><div class="section-title" id="pRoundTitle">Conectando…</div><div class="tiny" id="pMsg"></div></div><div style="text-align:right"><div class="timer" id="pTimer">—<small>AGUARDE</small></div></div></div>
+  <div class="progress"><div id="pProgress"></div></div><div class="spacer"></div>
+  <div id="pLobby" class="card"><div class="eyebrow">LOBBY</div><div class="section-title" style="font-size:29px">Quem está na sala?</div><p class="muted">A lista atualiza automaticamente para todos.</p><div id="pLobbyPlayers" class="player-list"></div></div>
+  <div id="pVote" class="card hidden"><div class="eyebrow">QUEM É O DONO?</div><div class="section-title" style="font-size:29px">Escolha uma pessoa</div><p class="muted">Você não verá o título, o artista ou a resposta.</p><div id="pVotePlayers" class="player-list"></div><div class="actions" style="justify-content:space-between;margin-top:17px"><div class="tiny" id="pVoteState">Nenhum voto</div><button class="btn secondary" id="pConfirm" disabled>Confirmar voto</button></div></div>
+  <div id="pWait" class="card hidden" style="text-align:center;padding:52px 18px"><div class="eyebrow">VOTO REGISTRADO</div><div class="big-number pulse" style="font-size:88px">✓</div><div class="section-title" style="font-size:26px">Agora é com a turma.</div><p class="muted">Aguarde o encerramento desta rodada.</p></div>
+  <div id="pResults" class="hidden"></div>
+  <div id="pFinal" class="hidden"></div>
+</section>
+
+<section id="adminScreen" class="screen">
+  <div class="status"><div><div class="eyebrow">PAINEL DO JUIZ</div><div class="section-title" style="font-size:28px" id="aTitle">Administrador</div><div class="tiny" id="aSubtitle">Nenhuma sala selecionada.</div></div><div class="actions"><button class="btn secondary" id="copyRoom">Copiar código</button><button class="btn danger" id="leaveAdmin">Sair</button></div></div>
+  <div class="kpis"><div class="kpi"><div class="v" id="kPlayers">0</div><div class="l">jogadores</div></div><div class="kpi"><div class="v" id="kSongs">0</div><div class="l">músicas</div></div><div class="kpi"><div class="v" id="kUsed">0</div><div class="l">tocadas</div></div><div class="kpi"><div class="v" id="kVotes">0</div><div class="l">votos</div></div></div>
+  <div class="admin-nav"><button class="admin-tab active" data-tab="control">Controle</button><button class="admin-tab" data-tab="players">Jogadores</button><button class="admin-tab" data-tab="songs">Músicas</button><button class="admin-tab" data-tab="ranking">Final</button></div>
+  <div id="tab-control" class="tab-pane">
+    <div class="grid grid-2">
+      <div class="card"><div class="eyebrow">RODADA ATUAL</div><div class="section-title" style="font-size:29px" id="aRound">Nenhuma rodada</div><p class="muted" id="aRoundMsg">Selecione a próxima música.</p><div class="spacer"></div><div class="actions"><button class="btn" id="startBtn">Iniciar rodada</button><button class="btn secondary" id="plus15">+15s</button><button class="btn danger" id="endBtn">Encerrar rodada</button><button class="btn secondary" id="forceReveal">Pular espera</button></div><div class="spacer"></div><div class="timer" id="aTimer">—<small>AGUARDE</small></div><div class="progress"><div id="aProgress"></div></div><div class="tiny" style="margin-top:10px">A música exibida aqui é privada do administrador.</div></div>
+      <div class="card"><div class="eyebrow">PRÓXIMA MÚSICA</div><div class="section-title" style="font-size:23px">Escolha o que está tocando</div><div class="field" style="margin-top:13px"><label>MÚSICA</label><select id="songSelect"></select></div><div id="aSongPreview" style="margin-top:14px"></div></div>
+    </div>
+    <div class="card" style="margin-top:13px"><div class="eyebrow">RESULTADO</div><div id="aResult" class="muted">Nenhum resultado disponível.</div></div>
+  </div>
+  <div id="tab-players" class="tab-pane hidden"><div class="card"><div class="eyebrow">PARTICIPANTES</div><div class="section-title" style="font-size:25px">Jogadores conectados</div><p class="muted">A lista atualiza em tempo real.</p><div class="hr"></div><div id="aPlayersTable"></div></div></div>
+  <div id="tab-songs" class="tab-pane hidden"><div class="card"><div class="eyebrow">ESCOPO MUSICAL</div><div class="section-title" style="font-size:25px">Músicas da partida</div><div class="grid grid-3" style="margin-top:13px"><div class="field"><label>TÍTULO</label><input id="sTitle" placeholder="Música"></div><div class="field"><label>ARTISTA</label><input id="sArtist" placeholder="Artista"></div><div class="field"><label>DONO</label><input id="sOwner" placeholder="Pessoa"></div></div><div class="grid grid-2" style="margin-top:11px"><div class="field"><label>CAPA (URL)</label><input id="sArt" placeholder="https://..."></div><div class="field"><label>SPOTIFY (URL)</label><input id="sSpotify" placeholder="https://open.spotify.com/track/..."/></div></div><div class="actions" style="margin-top:12px"><button class="btn" id="addSong">Adicionar música</button><button class="btn secondary" id="importBtn">Importar CSV</button><input type="file" id="csvFile" accept=".csv,text/csv" hidden></div><div class="hr"></div><div id="aSongsTable"></div></div></div>
+  <div id="tab-ranking" class="tab-pane hidden"><div class="card"><div class="eyebrow">FINAL DA PARTIDA</div><div class="section-title" style="font-size:25px">Ranking e encerramento</div><p class="muted">Só habilite quando todas as músicas tiverem sido tocadas.</p><div class="actions" style="margin:13px 0"><button class="btn danger" id="endGameBtn">Encerrar partida</button><button class="btn" id="nextRankBtn">Revelar próxima colocação</button><button class="btn secondary" id="exportImgBtn">Exportar imagem</button></div><div id="rankAdmin"></div></div></div>
+</section>
+</main></div>
+
+<div class="modal" id="configModal"><div class="modal-card"><div class="eyebrow">CONEXÃO</div><h2 style="margin:6px 0 7px">Conectar ao Supabase</h2><p class="muted">Cole a Project URL e a Publishable/anon key do seu projeto. Esses dados podem ficar no navegador; nunca use a service_role key.</p><div class="field"><label>PROJECT URL</label><input id="sbUrl" placeholder="https://xxxx.supabase.co"></div><div class="field" style="margin-top:10px"><label>PUBLISHABLE / ANON KEY</label><input id="sbKey" placeholder="sb_publishable_..." autocomplete="off"></div><div class="actions" style="margin-top:14px"><button class="btn" id="saveConfig">Conectar</button><button class="btn secondary" id="closeConfig">Cancelar</button></div><div id="configMsg" class="tiny" style="margin-top:10px"></div></div></div>
+<div class="modal" id="adminModal"><div class="modal-card"><div class="eyebrow">ADMINISTRADOR</div><h2 style="margin:6px 0 7px">Entrar ou criar uma sala</h2><div class="field"><label>OPÇÃO</label><select id="adminMode"><option value="create">Criar nova sala</option><option value="existing">Entrar na sala existente</option></select></div><div class="field" id="adminCodeWrap" style="margin-top:10px"><label>CÓDIGO DA SALA</label><input id="adminCode" maxlength="5" placeholder="Ex.: 7F82K"/></div><div class="field" style="margin-top:10px"><label>SENHA ADMINISTRATIVA</label><input id="adminPassword" type="password" autocomplete="off" placeholder="Senha da partida"></div><div class="field" id="adminTitleWrap" style="margin-top:10px"><label>NOME DA PARTIDA</label><input id="adminTitle" value="Jogo da Música — edição anual" maxlength="70"/></div><div class="actions" style="margin-top:14px"><button class="btn" id="adminGo">Continuar</button><button class="btn secondary" id="closeAdmin">Cancelar</button></div><div id="adminMsg" class="tiny" style="margin-top:10px"></div></div></div>
+<div class="modal" id="confirmEndModal"><div class="modal-card"><div class="eyebrow">DUPLA VERIFICAÇÃO</div><h2 style="margin:6px 0">Encerrar a partida?</h2><p class="muted">Depois disso, o jogo entra no ranking final e você não poderá iniciar novas rodadas. Para confirmar, marque a caixa e digite <b>ENCERRAR</b>.</p><label style="display:flex;gap:9px;align-items:center;font-size:13px;color:#ddd"><input type="checkbox" id="endCheck"> Eu conferi que todas as músicas foram tocadas.</label><div class="field" style="margin-top:12px"><label>CONFIRMAÇÃO</label><input id="endPhrase" placeholder="ENCERRAR" autocomplete="off"></div><div class="actions" style="margin-top:14px"><button class="btn danger" id="confirmEndGame" disabled>Encerrar definitivamente</button><button class="btn secondary" id="cancelEndGame">Voltar</button></div></div></div>
+<canvas id="shareCanvas" class="share-canvas" width="1600" height="2000"></canvas>
+
+<script>
 const SB_CONFIG_KEY='jogo-musica-supabase-config-v1';
 const PLAYER_KEY='jogo-musica-player-session-v1';
 let sb=null, channel=null, game=null, player=null, adminPassword='', adminMode=false, localVote=null, ticker=null, autoTimer=null;
@@ -315,110 +94,82 @@ function cfg(){try{return JSON.parse(localStorage.getItem(SB_CONFIG_KEY)||'null'
 function setConn(on,msg){$('connDot').className='dot '+(on?'on':'off');$('connText').textContent=msg}
 function showScreen(id){document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active'));$(id).classList.add('active');window.scrollTo({top:0,behavior:'smooth'})}
 function sessionToken(){let x=localStorage.getItem(PLAYER_KEY); if(!x){x=crypto.randomUUID();localStorage.setItem(PLAYER_KEY,x)} return x}
-async function connect(){const c=cfg(); if(!c){setConn(false,'não configurado');return false} try{sb=window.supabase.createClient(c.url,c.key); const {error}=await sb.from('games').select('id').limit(1); if(error && !String(error.message).includes('JWT')) throw error; setConn(true,'conectado'); return true}catch(e){setConn(false,'erro na conexão'); $('configMsg').textContent=e.message||'Não foi possível conectar.'; return false}}
+let supabaseLoadPromise=null;
+async function loadSupabase(){
+  if(window.supabase?.createClient) return true;
+  if(supabaseLoadPromise) return supabaseLoadPromise;
+  supabaseLoadPromise=new Promise(resolve=>{
+    const s=document.createElement('script');
+    s.src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
+    s.async=true;
+    let settled=false;
+    const finish=ok=>{if(settled)return;settled=true;resolve(ok)};
+    s.onload=()=>finish(!!window.supabase?.createClient);
+    s.onerror=()=>finish(false);
+    document.head.appendChild(s);
+    setTimeout(()=>finish(!!window.supabase?.createClient),10000);
+  });
+  return supabaseLoadPromise;
+}
+async function connect(){
+  const c=cfg();
+  if(!c){setConn(false,'não configurado');return false}
+  try{
+    if(!(await loadSupabase())) throw Error('A biblioteca do Supabase não pôde ser carregada. Verifique sua conexão ou tente novamente.');
+    sb=window.supabase.createClient(c.url,c.key);
+    const {error}=await sb.from('games').select('id').limit(1);
+    if(error && !String(error.message).includes('JWT')) throw error;
+    setConn(true,'conectado');
+    return true;
+  }catch(e){
+    setConn(false,'erro na conexão');
+    if($('configMsg')) $('configMsg').textContent=e.message||'Não foi possível conectar.';
+    return false;
+  }
+}
 async function rpc(name,args){if(!sb) throw Error('Supabase não configurado.'); const {data,error}=await sb.rpc(name,args); if(error) throw error; return data}
 function roomFromUrl(){return (new URLSearchParams(location.search).get('room')||'').toUpperCase()}
 function updateUrl(){if(game?.code) history.replaceState({},'',location.pathname+'?room='+encodeURIComponent(game.code))}
-function renderLobbyPlayers(){const arr=pubState.players||[]; $('pLobbyPlayers').innerHTML=arr.length?arr.map((p,i)=>`<button class="player-btn" disabled><span class="num">${String(i+1).padStart(2,'0')}</span>
-																	<span class="name">${esc(p.name)}</span>
-																</button>`).join(''):'<div class="tiny">Ninguém entrou ainda.</div>'}
-function renderVotePlayers(){const arr=pubState.players||[]; $('pVotePlayers').innerHTML=arr.filter(p=>p.id!==player?.id || arr.length===1).map((p,i)=>`<button class="player-btn ${localVote===p.id?'selected':''}" data-choice="${p.id}">
-																	<span class="num">${String(i+1).padStart(2,'0')}</span>
-																	<span class="name">${esc(p.name)}</span>
-																</button>`).join(''); document.querySelectorAll('[data-choice]').forEach(b=>b.onclick=()=>{localVote=b.dataset.choice;renderVotePlayers();$('pConfirm').disabled=false;$('pVoteState').textContent='Palpite selecionado';});}
-function timerUI(el,sec,total){if(sec==null){$(el).innerHTML='—<small>AGUARDE</small>';return} $(el).innerHTML=`${sec}<small>SEG</small>`;$(el).classList.toggle('low',sec<=10)} function publicRound(r){if(!r)return null; return r} async function refreshPublic(){if(!game)return; const [gRes,pRes,rRes,rankRes]=await Promise.all([sb.from('games').select('*').eq('id',game.id).single(),sb.from('players').select('id,name,game_id,joined_at').eq('game_id',game.id).order('joined_at'),sb.from('rounds').select('*').eq('game_id',game.id).order('number',{ascending:false}).limit(1),sb.from('public_rankings').select('*').eq('game_id',game.id).order('rank',{ascending:false})]); if(gRes.error)throw gRes.error; game={...game,...gRes.data}; pubState.players=pRes.data||[]; pubState.round=rRes.data?.[0]||null; pubState.rankings=rankRes.data||[]; if(pubState.round && ['results','reveal','done'].includes(pubState.round.status)){const rr=await sb.from('round_results').select('choice_player_id,player_name,vote_count').eq('round_id',pubState.round.id).order('vote_count',{ascending:false}); if(rr.error)throw rr.error; pubState.roundResults=rr.data||[]} else pubState.roundResults=[]; renderPublic(); if(adminMode) await refreshAdmin();} function renderPublic(){renderLobbyPlayers(); const r=pubState.round; if(!r){$('pLobby').classList.remove('hidden');$('pVote').classList.add('hidden');$('pWait').classList.add('hidden');$('pResults').classList.add('hidden');$('pFinal').classList.toggle('hidden',game?.phase!=='final_ranking' &&game?.phase!=='finished' );$('pRoundTitle').textContent=game?.title||'Aguardando o administrador…' ;$('pMsg').textContent='Sala conectada.' ;timerUI('pTimer',null);return} $('pRoundTitle').textContent=`Rodada ${r.number}`; $('pLobby').classList.toggle('hidden',r.status==='voting' ); $('pVote').classList.toggle('hidden',r.status!=='voting' || !player || localVote!==null); $('pWait').classList.toggle('hidden',r.status!=='voting' || localVote===null); $('pResults').classList.toggle('hidden',!['results','reveal','done'].includes(r.status)); if(r.status==='voting' ){ $('pEyebrow').textContent='VOTE AGORA' ;$('pMsg').textContent='Escolha de quem você acha que é a música.' ;renderVotePlayers(); const sec=Math.max(0,Math.ceil((new Date(r.ends_at).getTime()-Date.now()) 1000)); timerUI('pTimer',sec,r.duration_sec);$('pProgress').style.width=Math.max(0,Math.min(100,sec/r.duration_sec*100))+'%' ; } else if(r.status==='results' ){ $('pEyebrow').textContent='PALPITES DA TURMA' ;$('pMsg').textContent='Resultados da rodada.' ;timerUI('pTimer',0);renderResults(); } else if(r.status==='reveal' ){ $('pEyebrow').textContent='REVELAÇÃO' ;$('pMsg').textContent='Resposta revelada.' ;timerUI('pTimer',0);renderResults(true); } else { $('pEyebrow').textContent='RODADA ENCERRADA' ;$('pMsg').textContent='Aguardando a próxima rodada.' ;timerUI('pTimer',0);renderResults(true); } if(game?.phase==='final_ranking' ||game?.phase==='finished' )renderFinal(); else $('pFinal').classList.add('hidden'); } function resultRows(){const counts=Object.fromEntries((pubState.players||[]).map(p=>[p.id,0]));(pubState.roundResults||[]).forEach(v=>{counts[v.choice_player_id]=v.vote_count||0});return (pubState.players||[]).map(p=>({name:p.name,votes:counts[p.id]||0})).filter(x=>x.votes>0).sort((a,b)=>b.votes-a.votes)}
-function renderResults(reveal=false){const r=pubState.round;if(!r)return;const rows=resultRows();const max=Math.max(0,...rows.map(x=>x.votes)); $('pResults').innerHTML=`<div class="reveal-wrap">
-																		<div class="reveal">
-																			<div class="eyebrow">${reveal?'RESPOSTA':'RESULTADO'}</div>
-																			<div class="big-number">${r.total_votes||0}</div>
-																			<div class="tiny">votos computados</div>
-																			<div class="bars">${rows.map(x=>`<div class="bar-row">
-																					<div class="bar-name">${esc(x.name)}</div>
-																					<div class="bar">
-																						<i style="width:${max?x.votes/max*100:0}%"/>
-																					</div>
-																					<div class="bar-n">${x.votes}</div>
-																				</div>`).join('')||'<div class="tiny">Ninguém votou.</div>'}</div>${reveal?`<div class="answer show">${r.revealed_album_art_url?`<img class="cover" src="${esc(r.revealed_album_art_url)}" onerror="this.style.display='none'">`:''}<div class="song">${esc(r.revealed_title||'')}</div>
-																					<div class="artist">${esc(r.revealed_artist||'')}</div>
-																					<div class="owner">Era de ${esc(r.revealed_owner||'')}</div>
-																				</div>`:''}</div>
-																		</div>`}
-function renderFinal(){const list=[...(pubState.rankings||[])].sort((a,b)=>b.rank-a.rank); $('pFinal').classList.remove('hidden');$('pFinal').innerHTML=`<div class="card">
-																			<div class="eyebrow">RESULTADO FINAL</div>
-																			<div class="final-title">Do último ao campeão</div>
-																			<p class="muted" style="text-align:center">A classificação é revelada pelo juiz, uma colocação por vez.</p>
-																			<div class="rank-list">${list.map((x,i)=>`<div class="rank-card">
-																					<div class="rank-pos">${x.rank}º</div>
-																					<div>
-																						<div class="rank-name">${esc(x.player_name)}</div>
-																						<div class="tiny">colocação revelada</div>
-																					</div>
-																					<div class="rank-score">${x.score}<small>acertos</small>
-																					</div>
-																				</div>`).join('')||'<div class="tiny">Aguardando a primeira revelação…</div>'}</div>
-																		</div>`}
+function renderLobbyPlayers(){const arr=pubState.players||[]; $('pLobbyPlayers').innerHTML=arr.length?arr.map((p,i)=>`<button class="player-btn" disabled><span class="num">${String(i+1).padStart(2,'0')}</span><span class="name">${esc(p.name)}</span></button>`).join(''):'<div class="tiny">Ninguém entrou ainda.</div>'}
+function renderVotePlayers(){const arr=pubState.players||[]; $('pVotePlayers').innerHTML=arr.filter(p=>p.id!==player?.id || arr.length===1).map((p,i)=>`<button class="player-btn ${localVote===p.id?'selected':''}" data-choice="${p.id}"><span class="num">${String(i+1).padStart(2,'0')}</span><span class="name">${esc(p.name)}</span></button>`).join(''); document.querySelectorAll('[data-choice]').forEach(b=>b.onclick=()=>{localVote=b.dataset.choice;renderVotePlayers();$('pConfirm').disabled=false;$('pVoteState').textContent='Palpite selecionado';});}
+function timerUI(el,sec,total){if(sec==null){$(el).innerHTML='—<small>AGUARDE</small>';return} $(el).innerHTML=`${sec}<small>SEG</small>`;$(el).classList.toggle('low',sec<=10)}
+function publicRound(r){if(!r)return null; return r}
+async function refreshPublic(){if(!game)return; const [gRes,pRes,rRes,rankRes]=await Promise.all([sb.from('games').select('*').eq('id',game.id).single(),sb.from('players').select('id,name,game_id,joined_at').eq('game_id',game.id).order('joined_at'),sb.from('rounds').select('*').eq('game_id',game.id).order('number',{ascending:false}).limit(1),sb.from('public_rankings').select('*').eq('game_id',game.id).order('rank',{ascending:false})]); if(gRes.error)throw gRes.error; game={...game,...gRes.data}; pubState.players=pRes.data||[]; pubState.round=rRes.data?.[0]||null; pubState.rankings=rankRes.data||[]; if(pubState.round && ['results','reveal','done'].includes(pubState.round.status)){const rr=await sb.from('round_results').select('choice_player_id,player_name,vote_count').eq('round_id',pubState.round.id).order('vote_count',{ascending:false}); if(rr.error)throw rr.error; pubState.roundResults=rr.data||[]} else pubState.roundResults=[]; renderPublic(); if(adminMode) await refreshAdmin();}
+function renderPublic(){renderLobbyPlayers(); const r=pubState.round; if(!r){$('pLobby').classList.remove('hidden');$('pVote').classList.add('hidden');$('pWait').classList.add('hidden');$('pResults').classList.add('hidden');$('pFinal').classList.toggle('hidden',game?.phase!=='final_ranking'&&game?.phase!=='finished');$('pRoundTitle').textContent=game?.title||'Aguardando o administrador…';$('pMsg').textContent='Sala conectada.';timerUI('pTimer',null);return}
+ $('pRoundTitle').textContent=`Rodada ${r.number}`; $('pLobby').classList.toggle('hidden',r.status==='voting'); $('pVote').classList.toggle('hidden',r.status!=='voting' || !player || localVote!==null); $('pWait').classList.toggle('hidden',r.status!=='voting' || localVote===null); $('pResults').classList.toggle('hidden',!['results','reveal','done'].includes(r.status));
+ if(r.status==='voting'){ $('pEyebrow').textContent='VOTE AGORA';$('pMsg').textContent='Escolha de quem você acha que é a música.';renderVotePlayers(); const sec=Math.max(0,Math.ceil((new Date(r.ends_at).getTime()-Date.now())/1000)); timerUI('pTimer',sec,r.duration_sec);$('pProgress').style.width=Math.max(0,Math.min(100,sec/r.duration_sec*100))+'%'; }
+ else if(r.status==='results'){ $('pEyebrow').textContent='PALPITES DA TURMA';$('pMsg').textContent='Resultados da rodada.';timerUI('pTimer',0);renderResults(); }
+ else if(r.status==='reveal'){ $('pEyebrow').textContent='REVELAÇÃO';$('pMsg').textContent='Resposta revelada.';timerUI('pTimer',0);renderResults(true); }
+ else { $('pEyebrow').textContent='RODADA ENCERRADA';$('pMsg').textContent='Aguardando a próxima rodada.';timerUI('pTimer',0);renderResults(true); }
+ if(game?.phase==='final_ranking'||game?.phase==='finished')renderFinal(); else $('pFinal').classList.add('hidden');
+}
+function resultRows(){const counts=Object.fromEntries((pubState.players||[]).map(p=>[p.id,0]));(pubState.roundResults||[]).forEach(v=>{counts[v.choice_player_id]=v.vote_count||0});return (pubState.players||[]).map(p=>({name:p.name,votes:counts[p.id]||0})).filter(x=>x.votes>0).sort((a,b)=>b.votes-a.votes)}
+function renderResults(reveal=false){const r=pubState.round;if(!r)return;const rows=resultRows();const max=Math.max(0,...rows.map(x=>x.votes)); $('pResults').innerHTML=`<div class="reveal-wrap"><div class="reveal"><div class="eyebrow">${reveal?'RESPOSTA':'RESULTADO'}</div><div class="big-number">${r.total_votes||0}</div><div class="tiny">votos computados</div><div class="bars">${rows.map(x=>`<div class="bar-row"><div class="bar-name">${esc(x.name)}</div><div class="bar"><i style="width:${max?x.votes/max*100:0}%"></i></div><div class="bar-n">${x.votes}</div></div>`).join('')||'<div class="tiny">Ninguém votou.</div>'}</div>${reveal?`<div class="answer show">${r.revealed_album_art_url?`<img class="cover" src="${esc(r.revealed_album_art_url)}" onerror="this.style.display='none'">`:''}<div class="song">${esc(r.revealed_title||'')}</div><div class="artist">${esc(r.revealed_artist||'')}</div><div class="owner">Era de ${esc(r.revealed_owner||'')}</div></div>`:''}</div></div>`}
+function renderFinal(){const list=[...(pubState.rankings||[])].sort((a,b)=>b.rank-a.rank); $('pFinal').classList.remove('hidden');$('pFinal').innerHTML=`<div class="card"><div class="eyebrow">RESULTADO FINAL</div><div class="final-title">Do último ao campeão</div><p class="muted" style="text-align:center">A classificação é revelada pelo juiz, uma colocação por vez.</p><div class="rank-list">${list.map((x,i)=>`<div class="rank-card"><div class="rank-pos">${x.rank}º</div><div><div class="rank-name">${esc(x.player_name)}</div><div class="tiny">colocação revelada</div></div><div class="rank-score">${x.score}<small>acertos</small></div></div>`).join('')||'<div class="tiny">Aguardando a primeira revelação…</div>'}</div></div>`}
 function renderAdmin(){const a=adminState; $('aTitle').textContent=a.game?.title||game?.title||'Administrador';$('aSubtitle').textContent=a.game?`Sala ${a.game.code} • fase ${a.game.phase}`:'Nenhuma sala selecionada'; $('kPlayers').textContent=(a.players||[]).length; $('kSongs').textContent=(a.songs||[]).length; $('kUsed').textContent=(a.songs||[]).filter(s=>s.used).length; $('kVotes').textContent=(pubState.round?.total_votes||0); const left=(a.songs||[]).filter(s=>!s.used); $('songSelect').innerHTML=left.length?left.map(s=>`<option value="${s.id}">${esc(s.title)} — ${esc(s.artist)} / ${esc(s.owner)}</option>`).join(''):'<option value="">Nenhuma música disponível</option>';renderSongPreview();renderPlayersTable();renderSongsTable();renderRankAdmin();const r=a.round; if(!r){$('aRound').textContent='Nenhuma rodada';$('aRoundMsg').textContent=left.length?'Escolha a próxima música.':'Todas as músicas foram tocadas.';timerUI('aTimer',null);$('aProgress').style.width='100%';return} $('aRound').textContent=`Rodada ${r.number} • ${r.status}`;$('aRoundMsg').textContent=`${r.revealed_title||'Música em reprodução / oculta para jogadores'}`; if(r.status==='voting'){const sec=Math.max(0,Math.ceil((new Date(r.ends_at).getTime()-Date.now())/1000));timerUI('aTimer',sec);$('aProgress').style.width=Math.max(0,Math.min(100,sec/r.duration_sec*100))+'%'}else{timerUI('aTimer',0);$('aProgress').style.width='0%'} renderAdminResult();}
-function renderSongPreview(){const s=(adminState.songs||[]).find(x=>x.id===$('songSelect').value);$('aSongPreview').innerHTML=s?`<div class="song-preview">${s.album_art_url?`<img src="${esc(s.album_art_url)}">`:''}<div>
-																					<b>${esc(s.title)}</b>
-																					<div class="tiny">${esc(s.artist)} • de ${esc(s.owner)}</div>
-																				</div>
-																			</div>`:''}
-function renderPlayersTable(){const p=adminState.players||[];$('aPlayersTable').innerHTML=p.length?`<div class="table-wrap">
-																				<table class="table">
-																					<thead>
-																						<tr>
-																							<th>#</th>
-																							<th>Nome</th>
-																							<th>Entrou</th>
-																						</tr>
-																					</thead>
-																					<tbody>${p.map((x,i)=>`<tr>
-																							<td>${i+1}</td>
-																							<td>
-																								<b>${esc(x.name)}</b>
-																							</td>
-																							<td>${new Date(x.joined_at).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}</td>
-																						</tr>`).join('')}</tbody>
-																				</table>
-																			</div>`:'<div class="tiny">Nenhum jogador.</div>'}
-function renderSongsTable(){const s=adminState.songs||[];$('aSongsTable').innerHTML=s.length?`<div class="table-wrap">
-																				<table class="table">
-																					<thead>
-																						<tr>
-																							<th>Música</th>
-																							<th>Artista</th>
-																							<th>Dono</th>
-																							<th>Status</th>
-																							<th/>
-																						</tr>
-																					</thead>
-																					<tbody>${s.map(x=>`<tr>
-																							<td>
-																								<b>${esc(x.title)}</b>
-																							</td>
-																							<td>${esc(x.artist)}</td>
-																							<td>${esc(x.owner)}</td>
-																							<td>
-																								<span class="tag">${x.used?'tocada':'disponível'}</span>
-																							</td>
-																							<td>${x.used?'':`<button class="btn danger" style="padding:7px 9px" data-del-song="${x.id}">Excluir</button>`}</td>
-																						</tr>`).join('')}</tbody>
-																				</table>
-																			</div>`:'<div class="tiny">Nenhuma música cadastrada.</div>';document.querySelectorAll('[data-del-song]').forEach(b=>b.onclick=async()=>{try{await rpc('admin_delete_song',{p_game_id:game.id,p_password:adminPassword,p_song_id:b.dataset.delSong});await refreshAdmin()}catch(e){alert(e.message)}})}
+function renderSongPreview(){const s=(adminState.songs||[]).find(x=>x.id===$('songSelect').value);$('aSongPreview').innerHTML=s?`<div class="song-preview">${s.album_art_url?`<img src="${esc(s.album_art_url)}">`:''}<div><b>${esc(s.title)}</b><div class="tiny">${esc(s.artist)} • de ${esc(s.owner)}</div></div></div>`:''}
+function renderPlayersTable(){const p=adminState.players||[];$('aPlayersTable').innerHTML=p.length?`<div class="table-wrap"><table class="table"><thead><tr><th>#</th><th>Nome</th><th>Entrou</th></tr></thead><tbody>${p.map((x,i)=>`<tr><td>${i+1}</td><td><b>${esc(x.name)}</b></td><td>${new Date(x.joined_at).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}</td></tr>`).join('')}</tbody></table></div>`:'<div class="tiny">Nenhum jogador.</div>'}
+function renderSongsTable(){const s=adminState.songs||[];$('aSongsTable').innerHTML=s.length?`<div class="table-wrap"><table class="table"><thead><tr><th>Música</th><th>Artista</th><th>Dono</th><th>Status</th><th></th></tr></thead><tbody>${s.map(x=>`<tr><td><b>${esc(x.title)}</b></td><td>${esc(x.artist)}</td><td>${esc(x.owner)}</td><td><span class="tag">${x.used?'tocada':'disponível'}</span></td><td>${x.used?'':`<button class="btn danger" style="padding:7px 9px" data-del-song="${x.id}">Excluir</button>`}</td></tr>`).join('')}</tbody></table></div>`:'<div class="tiny">Nenhuma música cadastrada.</div>';document.querySelectorAll('[data-del-song]').forEach(b=>b.onclick=async()=>{try{await rpc('admin_delete_song',{p_game_id:game.id,p_password:adminPassword,p_song_id:b.dataset.delSong});await refreshAdmin()}catch(e){alert(e.message)}})}
 function renderAdminResult(){const rows=resultRows();$('aResult').innerHTML=rows.length?rows.map(x=>`${esc(x.name)}: <b>${x.votes}</b>`).join(' • '):'Nenhum resultado disponível.'}
-function renderRankAdmin(){const r=adminState.rankings||[];const all=adminState.finalResults||[]; $('rankAdmin').innerHTML=adminState.game?.phase==='lobby'?'<div class="tiny">A partida ainda não começou.</div>':adminState.game?.phase==='final_ranking'||adminState.game?.phase==='finished'?`<div class="rank-list">${(r.length?r:[...all].sort((a,b)=>b.rank-a.rank)).map(x=>`<div class="rank-card">
-																					<div class="rank-pos">${x.rank}º</div>
-																					<div class="rank-name">${esc(x.player_name||x.name||'')}</div>
-																					<div class="rank-score">${x.score}<small>acertos</small>
-																					</div>
-																				</div>`).join('')}</div>`:''}
+function renderRankAdmin(){const r=adminState.rankings||[];const all=adminState.finalResults||[]; $('rankAdmin').innerHTML=adminState.game?.phase==='lobby'?'<div class="tiny">A partida ainda não começou.</div>':adminState.game?.phase==='final_ranking'||adminState.game?.phase==='finished'?`<div class="rank-list">${(r.length?r:[...all].sort((a,b)=>b.rank-a.rank)).map(x=>`<div class="rank-card"><div class="rank-pos">${x.rank}º</div><div class="rank-name">${esc(x.player_name||x.name||'')}</div><div class="rank-score">${x.score}<small>acertos</small></div></div>`).join('')}</div>`:''}
 async function refreshAdmin(){if(!adminMode||!game)return; adminState=await rpc('admin_state',{p_game_id:game.id,p_password:adminPassword}); adminState.game=adminState.game; adminState.round=adminState.game.current_round_id?await getRound(adminState.game.current_round_id):null;adminState.players=adminState.players||[];adminState.songs=adminState.songs||[];adminState.rankings=adminState.publicRankings||[];adminState.finalResults=adminState.finalResults||[];renderAdmin()}
 async function getRound(id){const {data,error}=await sb.from('rounds').select('*').eq('id',id).single();if(error)throw error;return data}
 async function joinRoom(){try{if(!sb && !(await connect()))return; const code=$('roomCode').value.trim().toUpperCase();const name=$('playerName').value.trim();if(code.length!==5||!name)return alert('Informe o código da sala e seu nome.');const g=await rpc('get_game_by_code',{p_code:code});if(!g?.length)return alert('Sala não encontrada.');game={id:g[0].game_id,code:g[0].game_code,title:g[0].title,phase:g[0].phase,round_no:g[0].round_no,current_round_id:g[0].current_round_id,final_reveal_rank:g[0].final_reveal_rank};const p=await rpc('join_game',{p_game_id:game.id,p_name:name,p_session_token:sessionToken()});player={id:p[0].player_id,name:p[0].player_name};localVote=null;updateUrl();showScreen('playerScreen');await subscribe();await refreshPublic()}catch(e){alert(e.message||'Erro ao entrar na sala.')}}
 async function subscribe(){if(channel){await sb.removeChannel(channel);channel=null} channel=sb.channel('game-'+game.id).on('postgres_changes',{event:'*',schema:'public',table:'games',filter:'id=eq.'+game.id},async()=>{await refreshPublic()}).on('postgres_changes',{event:'*',schema:'public',table:'players',filter:'game_id=eq.'+game.id},async()=>{await refreshPublic()}).on('postgres_changes',{event:'*',schema:'public',table:'rounds',filter:'game_id=eq.'+game.id},async()=>{await refreshPublic();scheduleAutomaticTransitions()}).on('postgres_changes',{event:'*',schema:'public',table:'public_rankings',filter:'game_id=eq.'+game.id},async()=>{await refreshPublic()}).subscribe();}
 function scheduleAutomaticTransitions(){clearTimeout(autoTimer);const r=pubState.round;if(!r)return;if(r.status==='results'){const wait=Math.max(0,new Date(r.results_until).getTime()-Date.now());autoTimer=setTimeout(async()=>{try{await rpc('publish_reveal_if_due',{p_round_id:r.id});await refreshPublic()}catch{ }},wait+120)}else if(r.status==='reveal'){const wait=Math.max(0,new Date(r.reveal_until).getTime()-Date.now());autoTimer=setTimeout(async()=>{try{await rpc('finish_reveal_if_due',{p_round_id:r.id});await refreshPublic()}catch{ }},wait+120)}}
 function startTicker(){clearInterval(ticker);ticker=setInterval(()=>{if(pubState.round?.status==='voting'){const r=pubState.round;const sec=Math.max(0,Math.ceil((new Date(r.ends_at).getTime()-Date.now())/1000));timerUI('pTimer',sec);$('pProgress').style.width=Math.max(0,Math.min(100,sec/r.duration_sec*100))+'%';if(adminMode)timerUI('aTimer',sec)}},500)}
-async function createOrEnterAdmin(){try{if(!sb && !(await connect()))return;const mode=$('adminMode').value,pass=$('adminPassword').value; if(pass.length<6)return alert('Use uma senha de pelo menos 6 caracteres.');let g;if(mode==='create' ){const data=await rpc('create_game',{p_title:$('adminTitle').value.trim()||'Jogo da Música — edição anual',p_password:pass});game={id:data[0].game_id,code:data[0].game_code};adminPassword=pass}else{const code=$('adminCode' ).value.trim().toUpperCase();const q=await rpc('get_game_by_code',{p_code:code});if(!q?.length)return alert('Sala não encontrada.');game={id:q[0].game_id,code:q[0].game_code};if(!(await rpc('verify_admin',{p_game_id:game.id,p_password:pass})))return alert('Senha administrativa inválida.');adminPassword=pass} adminMode=true;updateUrl();$('adminModal' ).classList.remove('show');showScreen('adminScreen');await subscribe();await refreshPublic();await refreshAdmin()}catch(e){$('adminMsg').textContent=e.message||'Erro administrativo.' }} async function startRound(){try{const id=$('songSelect' ).value;if(!id)return alert('Adicione uma música e selecione-a.');await rpc('admin_start_round',{p_game_id:game.id,p_password:adminPassword,p_song_id:id});localVote=null;await refreshPublic();await refreshAdmin();startTicker()}catch(e){alert(e.message)}} async function plus15(){try{await rpc('admin_extend_round',{p_game_id:game.id,p_password:adminPassword});await refreshPublic();await refreshAdmin()}catch(e){alert(e.message)}} async function endRound(){try{await rpc('admin_end_round',{p_game_id:game.id,p_password:adminPassword});await refreshPublic();await refreshAdmin();scheduleAutomaticTransitions()}catch(e){alert(e.message)}} async function forceReveal(){try{await rpc('admin_force_reveal',{p_game_id:game.id,p_password:adminPassword});await refreshPublic();await refreshAdmin();scheduleAutomaticTransitions()}catch(e){alert(e.message)}} async function endGame(){const r=adminState.round;if(r&&['voting' ,'results','reveal'].includes(r.status))return alert('Encerre a rodada atual antes de terminar a partida.');try{await rpc('admin_start_final',{p_game_id:game.id,p_password:adminPassword});await refreshPublic();await refreshAdmin()}catch(e){alert(e.message)}} async function nextRank(){try{await rpc('admin_reveal_next_rank',{p_game_id:game.id,p_password:adminPassword});await refreshPublic();await refreshAdmin()}catch(e){alert(e.message)}} async function vote(){if(!localVote||!player||!pubState.round)return;try{await rpc('cast_vote',{p_round_id:pubState.round.id,p_player_id:player.id,p_session_token:sessionToken(),p_choice_player_id:localVote});$('pConfirm').disabled=true;$('pVoteState' ).textContent='Voto confirmado' ;}catch(e){alert(e.message)}} function parseCsv(t){const out=[];let row=[],cell='' ,q=false;for(let i=0;i<t.length;i++){const c=t[i],n=t[i+1];if(c==='"' &&q&&n==='"' ){cell+='"' ;i++;continue}if(c==='"' ){q=!q;continue}if(c===',' &&!q){row.push(cell);cell='' ;continue}if((c==='\n' ||c==='\r' )&&!q){if(c==='\r' &&n==='\n' )i++;row.push(cell);out.push(row);row=[];cell='' ;continue}cell+=c}if(cell||row.length){row.push(cell);out.push(row)}return out} async function importCsv(file){const text=await file.text();const rows=parseCsv(text);const h=rows.shift().map(x=>x.trim().toLowerCase());const idx=x=>h.indexOf(x.toLowerCase());let ok=0;for(const row of rows){const title=row[idx('title' )]||'',artist=row[idx('artist' )]||'',owner=row[idx('owner' )]||'';if(!title||!artist||!owner)continue;await rpc('admin_add_song',{p_game_id:game.id,p_password:adminPassword,p_title:title,p_artist:artist,p_owner:owner,p_album_art_url:row[idx('albumArtUrl')]||row[idx('album_art_url')]||'',p_spotify_url:row[idx('spotifyUrl')]||row[idx('spotify_url')]||''});ok++}alert(`${ok} músicas importadas.`);await refreshAdmin()} function downloadBlob(name,blob){const a=document.createElement('a' );a.href=URL.createObjectURL(blob);a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)} function exportImage(){const c=$('shareCanvas' ),ctx=c.getContext('2d' );const W=c.width,H=c.height;ctx.fillStyle='#06060a' ;ctx.fillRect(0,0,W,H);const grad=ctx.createLinearGradient(0,0,W,H);grad.addColorStop(0,'#ff3cac' );grad.addColorStop(.55,'#7c4dff');grad.addColorStop(1,'#22d3ee');ctx.globalAlpha=.22;ctx.fillStyle=grad;ctx.beginPath();ctx.arc(130,180,340,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.arc(1460,350,300,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1;ctx.fillStyle='#f7f7fb' ;ctx.font='900 82px Inter, Arial' ;ctx.fillText('JOGO DA MÚSICA',90,150);ctx.fillStyle='#a5a6b0' ;ctx.font='600 26px Inter, Arial' ;ctx.fillText((game?.title||'Edição anual').toUpperCase(),94,195);ctx.fillStyle='#ff8bcb' ;ctx.font='800 23px Inter, Arial' ;ctx.fillText(`SALA ${game?.code||''}`,94,250);let y=345;ctx.fillStyle='#f7f7fb' ;ctx.font='850 32px Inter, Arial' ;ctx.fillText('CLASSIFICAÇÃO FINAL',94,y);y+=55;const list=[...(adminState.finalResults||[])].sort((a,b)=>a.rank-b.rank);list.forEach((x,i)=>{const yy=y+i*82;ctx.fillStyle=i<3?'#f7f7fb' :'#d1d1d8';ctx.font=`900 ${i<3?42:34}px Inter, Arial`;ctx.fillText(`${x.rank}º`,100,yy);ctx.font='800 30px Inter, Arial' ;ctx.fillText(x.name||x.player_name,210,yy);ctx.fillStyle='#9ea0ab' ;ctx.font='700 23px Inter, Arial' ;ctx.fillText(`${x.score} acertos`,1220,yy)});const bottom=Math.min(H-340,y+list.length*82+70);ctx.strokeStyle='rgba(255,255,255,.1)' ;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(90,bottom);ctx.lineTo(W-90,bottom);ctx.stroke();ctx.fillStyle='#f7f7fb' ;ctx.font='850 28px Inter, Arial' ;ctx.fillText('ESTATÍSTICAS',94,bottom+62);const totalRounds=(adminState.game?.round_no||0);const totalVotes=pubState.round?.total_votes||0;ctx.fillStyle='#a9aab5' ;ctx.font='700 24px Inter, Arial' ;ctx.fillText(`${totalRounds} rodadas`,95,bottom+106);ctx.fillText(`${totalVotes} votos na última rodada`,330,bottom+106);ctx.fillStyle='#7f818d' ;ctx.font='600 18px Inter, Arial' ;ctx.fillText('Feito para uma noite de música, amigos e suspeitas.',94,H-100);c.toBlob(b=>downloadBlob(`jogo-da-musica-${game?.code||'resultado'}.png`,b),'image/png')}
+async function createOrEnterAdmin(){try{if(!sb && !(await connect()))return;const mode=$('adminMode').value,pass=$('adminPassword').value; if(pass.length<6)return alert('Use uma senha de pelo menos 6 caracteres.');let g;if(mode==='create'){const data=await rpc('create_game',{p_title:$('adminTitle').value.trim()||'Jogo da Música — edição anual',p_password:pass});game={id:data[0].game_id,code:data[0].game_code};adminPassword=pass}else{const code=$('adminCode').value.trim().toUpperCase();const q=await rpc('get_game_by_code',{p_code:code});if(!q?.length)return alert('Sala não encontrada.');game={id:q[0].game_id,code:q[0].game_code};if(!(await rpc('verify_admin',{p_game_id:game.id,p_password:pass})))return alert('Senha administrativa inválida.');adminPassword=pass} adminMode=true;updateUrl();$('adminModal').classList.remove('show');showScreen('adminScreen');await subscribe();await refreshPublic();await refreshAdmin()}catch(e){$('adminMsg').textContent=e.message||'Erro administrativo.'}}
+async function startRound(){try{const id=$('songSelect').value;if(!id)return alert('Adicione uma música e selecione-a.');await rpc('admin_start_round',{p_game_id:game.id,p_password:adminPassword,p_song_id:id});localVote=null;await refreshPublic();await refreshAdmin();startTicker()}catch(e){alert(e.message)}}
+async function plus15(){try{await rpc('admin_extend_round',{p_game_id:game.id,p_password:adminPassword});await refreshPublic();await refreshAdmin()}catch(e){alert(e.message)}}
+async function endRound(){try{await rpc('admin_end_round',{p_game_id:game.id,p_password:adminPassword});await refreshPublic();await refreshAdmin();scheduleAutomaticTransitions()}catch(e){alert(e.message)}}
+async function forceReveal(){try{await rpc('admin_force_reveal',{p_game_id:game.id,p_password:adminPassword});await refreshPublic();await refreshAdmin();scheduleAutomaticTransitions()}catch(e){alert(e.message)}}
+async function endGame(){const r=adminState.round;if(r&&['voting','results','reveal'].includes(r.status))return alert('Encerre a rodada atual antes de terminar a partida.');try{await rpc('admin_start_final',{p_game_id:game.id,p_password:adminPassword});await refreshPublic();await refreshAdmin()}catch(e){alert(e.message)}}
+async function nextRank(){try{await rpc('admin_reveal_next_rank',{p_game_id:game.id,p_password:adminPassword});await refreshPublic();await refreshAdmin()}catch(e){alert(e.message)}}
+async function vote(){if(!localVote||!player||!pubState.round)return;try{await rpc('cast_vote',{p_round_id:pubState.round.id,p_player_id:player.id,p_session_token:sessionToken(),p_choice_player_id:localVote});$('pConfirm').disabled=true;$('pVoteState').textContent='Voto confirmado';}catch(e){alert(e.message)}}
+function parseCsv(t){const out=[];let row=[],cell='',q=false;for(let i=0;i<t.length;i++){const c=t[i],n=t[i+1];if(c==='"'&&q&&n==='"'){cell+='"';i++;continue}if(c==='"'){q=!q;continue}if(c===','&&!q){row.push(cell);cell='';continue}if((c==='\n'||c==='\r')&&!q){if(c==='\r'&&n==='\n')i++;row.push(cell);out.push(row);row=[];cell='';continue}cell+=c}if(cell||row.length){row.push(cell);out.push(row)}return out}
+async function importCsv(file){const text=await file.text();const rows=parseCsv(text);const h=rows.shift().map(x=>x.trim().toLowerCase());const idx=x=>h.indexOf(x.toLowerCase());let ok=0;for(const row of rows){const title=row[idx('title')]||'',artist=row[idx('artist')]||'',owner=row[idx('owner')]||'';if(!title||!artist||!owner)continue;await rpc('admin_add_song',{p_game_id:game.id,p_password:adminPassword,p_title:title,p_artist:artist,p_owner:owner,p_album_art_url:row[idx('albumArtUrl')]||row[idx('album_art_url')]||'',p_spotify_url:row[idx('spotifyUrl')]||row[idx('spotify_url')]||''});ok++}alert(`${ok} músicas importadas.`);await refreshAdmin()}
+function downloadBlob(name,blob){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
+function exportImage(){const c=$('shareCanvas'),ctx=c.getContext('2d');const W=c.width,H=c.height;ctx.fillStyle='#06060a';ctx.fillRect(0,0,W,H);const grad=ctx.createLinearGradient(0,0,W,H);grad.addColorStop(0,'#ff3cac');grad.addColorStop(.55,'#7c4dff');grad.addColorStop(1,'#22d3ee');ctx.globalAlpha=.22;ctx.fillStyle=grad;ctx.beginPath();ctx.arc(130,180,340,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.arc(1460,350,300,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1;ctx.fillStyle='#f7f7fb';ctx.font='900 82px Inter, Arial';ctx.fillText('JOGO DA MÚSICA',90,150);ctx.fillStyle='#a5a6b0';ctx.font='600 26px Inter, Arial';ctx.fillText((game?.title||'Edição anual').toUpperCase(),94,195);ctx.fillStyle='#ff8bcb';ctx.font='800 23px Inter, Arial';ctx.fillText(`SALA ${game?.code||''}`,94,250);let y=345;ctx.fillStyle='#f7f7fb';ctx.font='850 32px Inter, Arial';ctx.fillText('CLASSIFICAÇÃO FINAL',94,y);y+=55;const list=[...(adminState.finalResults||[])].sort((a,b)=>a.rank-b.rank);list.forEach((x,i)=>{const yy=y+i*82;ctx.fillStyle=i<3?'#f7f7fb':'#d1d1d8';ctx.font=`900 ${i<3?42:34}px Inter, Arial`;ctx.fillText(`${x.rank}º`,100,yy);ctx.font='800 30px Inter, Arial';ctx.fillText(x.name||x.player_name,210,yy);ctx.fillStyle='#9ea0ab';ctx.font='700 23px Inter, Arial';ctx.fillText(`${x.score} acertos`,1220,yy)});const bottom=Math.min(H-340,y+list.length*82+70);ctx.strokeStyle='rgba(255,255,255,.1)';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(90,bottom);ctx.lineTo(W-90,bottom);ctx.stroke();ctx.fillStyle='#f7f7fb';ctx.font='850 28px Inter, Arial';ctx.fillText('ESTATÍSTICAS',94,bottom+62);const totalRounds=(adminState.game?.round_no||0);const totalVotes=pubState.round?.total_votes||0;ctx.fillStyle='#a9aab5';ctx.font='700 24px Inter, Arial';ctx.fillText(`${totalRounds} rodadas`,95,bottom+106);ctx.fillText(`${totalVotes} votos na última rodada`,330,bottom+106);ctx.fillStyle='#7f818d';ctx.font='600 18px Inter, Arial';ctx.fillText('Feito para uma noite de música, amigos e suspeitas.',94,H-100);c.toBlob(b=>downloadBlob(`jogo-da-musica-${game?.code||'resultado'}.png`,b),'image/png')}
 
 $('configBtn').onclick=()=>{$('configModal').classList.add('show');const c=cfg();if(c){$('sbUrl').value=c.url||'';$('sbKey').value=c.key||''}};$('closeConfig').onclick=()=>$('configModal').classList.remove('show');$('saveConfig').onclick=async()=>{const url=$('sbUrl').value.trim(),key=$('sbKey').value.trim();if(!url||!key)return alert('Preencha os dois campos.');localStorage.setItem(SB_CONFIG_KEY,JSON.stringify({url,key}));if(await connect()){$('configMsg').textContent='Conectado.';setTimeout(()=>$('configModal').classList.remove('show'),500)}};
 $('homeBtn').onclick=()=>showScreen('homeScreen');$('joinBtn').onclick=joinRoom;$('roomCode').value=roomFromUrl();
@@ -426,7 +177,21 @@ $('adminBtn').onclick=()=>{$('adminModal').classList.add('show');$('adminMode').
 $('startBtn').onclick=startRound;$('plus15').onclick=plus15;$('endBtn').onclick=endRound;$('forceReveal').onclick=forceReveal;$('pConfirm').onclick=vote;$('songSelect').onchange=renderSongPreview;$('addSong').onclick=async()=>{try{await rpc('admin_add_song',{p_game_id:game.id,p_password:adminPassword,p_title:$('sTitle').value.trim(),p_artist:$('sArtist').value.trim(),p_owner:$('sOwner').value.trim(),p_album_art_url:$('sArt').value.trim(),p_spotify_url:$('sSpotify').value.trim()});['sTitle','sArtist','sOwner','sArt','sSpotify'].forEach(id=>$(id).value='');await refreshAdmin()}catch(e){alert(e.message)}};$('importBtn').onclick=()=>$('csvFile').click();$('csvFile').onchange=e=>{if(e.target.files[0])importCsv(e.target.files[0])};
 $('copyRoom').onclick=async()=>{try{await navigator.clipboard.writeText(game.code);$('copyRoom').textContent='Copiado ✓';setTimeout(()=>$('copyRoom').textContent='Copiar código',1000)}catch{alert(game.code)}};$('leaveAdmin').onclick=()=>{adminMode=false;adminPassword='';showScreen('homeScreen')};$('endGameBtn').onclick=()=>{$('confirmEndModal').classList.add('show');$('endCheck').checked=false;$('endPhrase').value='';$('confirmEndGame').disabled=true};$('cancelEndGame').onclick=()=>$('confirmEndModal').classList.remove('show');function syncEndButton(){$('confirmEndGame').disabled=!($('endCheck').checked&&$('endPhrase').value.trim().toUpperCase()==='ENCERRAR')}$('endCheck').onchange=syncEndButton;$('endPhrase').oninput=syncEndButton;$('confirmEndGame').onclick=async()=>{ $('confirmEndModal').classList.remove('show');await endGame()};$('nextRankBtn').onclick=nextRank;$('exportImgBtn').onclick=exportImage;
 document.querySelectorAll('.admin-tab').forEach(b=>b.onclick=()=>{document.querySelectorAll('.admin-tab').forEach(x=>x.classList.remove('active'));b.classList.add('active');document.querySelectorAll('.tab-pane').forEach(x=>x.classList.add('hidden'));$('tab-'+b.dataset.tab).classList.remove('hidden')});
-(async()=>{await connect();if(roomFromUrl())$('roomCode').value=roomFromUrl();startTicker()})();
+async function boot(){
+  try{
+    const room=roomFromUrl();
+    if(room) $('roomCode').value=room;
+    setConn(false,cfg()?'conectando…':'não configurado');
+    if(cfg()) await connect();
+    startTicker();
+  }catch(e){
+    console.error('Jogo da Música — erro de inicialização',e);
+    setConn(false,'erro na inicialização');
+    if($('configMsg')) $('configMsg').textContent=e.message||String(e); if($('fatalError')){ $('fatalError').textContent='Erro ao iniciar o aplicativo: '+(e.message||String(e)); $('fatalError').classList.remove('hidden'); }
+  }
+}
+if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot,{once:true}); else boot();
 </script>
-																		</body>
-																	</html>
+<noscript><div style="position:fixed;inset:0;background:#050507;color:#fff;display:grid;place-items:center;padding:24px;text-align:center;font-family:system-ui">Este jogo precisa de JavaScript ativado no navegador.</div></noscript>
+</body>
+</html>
