@@ -1,120 +1,169 @@
-const JSON_HEADERS = {
-  "content-type": "application/json; charset=utf-8",
-  "cache-control": "public, max-age=300"
-};
-
-function json(body, status = 200) {
-  return new Response(JSON.stringify(body), {
+const json = (body, status = 200, extraHeaders = {}) =>
+  Response.json(body, {
     status,
-    headers: JSON_HEADERS
+    headers: {
+      "Cache-Control": "no-store",
+      "Access-Control-Allow-Origin": "*",
+      ...extraHeaders,
+    },
   });
+
+function decodeHtml(value) {
+  return String(value || "")
+    .replace(/&amp;/g, "&")
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;|&apos;/g, "'")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .trim();
 }
 
-function isSpotifyTrackUrl(value) {
+function extractArtist(html) {
+  if (!html) return "";
+
+  const strategies = [
+    // JSON-LD / structured data.
+    /"byArtist"\s*:\s*\{[^{}]*?"name"\s*:\s*"([^"]+)"/i,
+    /"artist"\s*:\s*\{[^{}]*?"name"\s*:\s*"([^"]+)"/i,
+
+    // Artist link in the Spotify embed HTML.
+    /href=["'](?:https?:\/\/open\.spotify\.com)?\/artist\/[A-Za-z0-9]+[^"']*["'][^>]*>\s*([^<]+?)\s*<\/a>/i,
+    /href=["'][^"']*\/artist\/[A-Za-z0-9]+[^"']*["'][^>]*>\s*([^<]+?)\s*<\/a>/i,
+
+    // Common metadata forms.
+    /itemprop=["']byArtist["'][^>]*content=["']([^"']+)["']/i,
+    /property=["']music:musician["'][^>]*content=["']([^"']+)["']/i,
+  ];
+
+  for (const pattern of strategies) {
+    const match = html.match(pattern);
+    if (match?.[1]) {
+      const artist = decodeHtml(match[1]);
+      if (artist && artist.length < 300) return artist;
+    }
+  }
+
+  return "";
+}
+
+function validSpotifyTrackUrl(target) {
   try {
-    const u = new URL(value);
+    const u = new URL(target);
     const host = u.hostname.toLowerCase().replace(/^www\./, "");
+    if (host !== "open.spotify.com" && host !== "spotify.link") return false;
     if (host === "spotify.link") return true;
-    if (host !== "open.spotify.com") return false;
-    return /^\/(?:intl-[^/]+\/)?track\/[A-Za-z0-9]+\/?$/i.test(u.pathname);
+    return /^\/(?:intl-[^/]+\/)?track\/[A-Za-z0-9]+$/i.test(
+      u.pathname.replace(/\/+$/, "")
+    );
   } catch {
     return false;
   }
 }
 
-async function spotifyOEmbed(target) {
-  const endpoint =
-    "https://open.spotify.com/oembed?url=" +
-    encodeURIComponent(target);
+async function spotifyMetadata(target) {
+  const oembedUrl =
+    "https://open.spotify.com/oembed?url=" + encodeURIComponent(target);
 
-  const r = await fetch(endpoint, {
+  const oembedResponse = await fetch(oembedUrl, {
     headers: {
-      "accept": "application/json",
-      "user-agent": "the-ultimate-jogo-da-musica/7.2"
-    }
+      Accept: "application/json",
+      "User-Agent": "the-ultimate-jogo-da-musica/7.2",
+    },
   });
 
-  if (!r.ok) {
-    return json(
-      { error: `O Spotify recusou a consulta (HTTP ${r.status}).` },
-      502
-    );
+  if (!oembedResponse.ok) {
+    throw new Error(`Spotify oEmbed respondeu HTTP ${oembedResponse.status}.`);
   }
 
-  const data = await r.json();
-
-  const title = typeof data.title === "string" ? data.title.trim() : "";
-  const artist =
-    typeof data.author_name === "string" ? data.author_name.trim() : "";
+  const oembed = await oembedResponse.json();
+  const title = typeof oembed.title === "string" ? oembed.title.trim() : "";
   const albumArt =
-    typeof data.thumbnail_url === "string" ? data.thumbnail_url : "";
+    typeof oembed.thumbnail_url === "string" ? oembed.thumbnail_url : "";
+  const iframeUrl =
+    typeof oembed.iframe_url === "string" ? oembed.iframe_url : "";
 
-  if (!title) {
-    return json(
-      { error: "O Spotify não retornou o título dessa faixa." },
-      422
-    );
+  if (!title || !iframeUrl) {
+    throw new Error("O Spotify não retornou os metadados esperados para essa faixa.");
+  }
+
+  // oEmbed intentionally does not expose the artist as a separate field.
+  // The public Spotify embed page does expose the artist link, so we use that
+  // page only for the missing artist name. No Spotify credentials are needed.
+  const embedResponse = await fetch(iframeUrl, {
+    headers: {
+      Accept: "text/html,application/xhtml+xml",
+      "User-Agent": "the-ultimate-jogo-da-musica/7.2",
+    },
+  });
+
+  let artist = "";
+  if (embedResponse.ok) {
+    artist = extractArtist(await embedResponse.text());
   }
 
   if (!artist) {
-    return json(
-      {
-        error:
-          "O Spotify retornou a faixa, mas não informou o artista no oEmbed."
-      },
-      422
+    throw new Error(
+      "O Spotify retornou a música e a capa, mas não foi possível identificar o artista."
     );
   }
 
-  return json({
+  return {
     title,
     artist,
     album_art_url: albumArt,
-    spotify_url: target
-  });
+    spotify_url: target,
+  };
 }
 
 export default {
-  async fetch(request, env, ctx) {
+  async fetch(request, env) {
     const url = new URL(request.url);
 
-    // Our API route. It runs before static assets.
     if (url.pathname === "/api/spotify") {
+      if (request.method === "OPTIONS") {
+        return new Response(null, {
+          status: 204,
+          headers: {
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": "GET, OPTIONS",
+            "Access-Control-Allow-Headers": "Content-Type",
+          },
+        });
+      }
+
       if (request.method !== "GET") {
         return json({ error: "Método não permitido." }, 405);
       }
 
-      const target = url.searchParams.get("url");
-      if (!target) {
-        return json({ error: "Informe uma URL do Spotify." }, 400);
-      }
+      const target = url.searchParams.get("url")?.trim();
+      if (!target) return json({ error: "Informe uma URL do Spotify." }, 400);
 
-      if (!isSpotifyTrackUrl(target)) {
+      if (!validSpotifyTrackUrl(target)) {
         return json(
           {
             error:
-              "Use uma URL de uma faixa (track) do Spotify, como https://open.spotify.com/track/..."
+              "Use uma URL de uma música individual (track) do Spotify.",
           },
           422
         );
       }
 
       try {
-        return await spotifyOEmbed(target);
+        return json(await spotifyMetadata(target), 200, {
+          "Cache-Control": "public, max-age=86400",
+        });
       } catch (error) {
         return json(
           {
             error:
-              `Não foi possível consultar o Spotify: ${
-                error?.message || "erro desconhecido"
-              }.`
+              error?.message || "Não foi possível consultar o Spotify.",
           },
           502
         );
       }
     }
 
-    // Every other request is handled by the static-assets binding.
+    // Every non-API request is handled by the static site assets.
     return env.ASSETS.fetch(request);
-  }
+  },
 };
