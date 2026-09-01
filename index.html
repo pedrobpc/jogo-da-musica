@@ -192,25 +192,28 @@
 #playerScreen{padding-bottom:190px}
 .round-results-hero{padding-bottom:105px}
 .round-results-hero .reveal-wrap{min-height:auto;padding-top:4px}
-.timer.critical{
-  animation:timerUrgency .12s steps(2,end) infinite;
-  transform-origin:center;
-  text-shadow:0 0 14px rgba(255,60,172,.18);
-}
-#aTimer.timer.critical{
-  animation:timerUrgencyAdmin .16s steps(2,end) infinite;
-  text-shadow:0 0 7px rgba(255,60,172,.10);
-}
-@keyframes timerUrgency{
-  0%,100%{text-shadow:0 0 10px rgba(255,60,172,.14),1px 0 0 rgba(255,60,172,.18),-1px 0 0 rgba(124,77,255,.12)}
-  50%{text-shadow:0 0 16px rgba(255,60,172,.22),-1px 0 0 rgba(255,60,172,.18),1px 0 0 rgba(124,77,255,.14)}
+.timer.critical{animation:timerUrgencyPlayer .18s steps(2,end) infinite;transform-origin:center;text-shadow:0 0 14px rgba(255,60,172,.18)}
+#aTimer.timer.critical{animation:timerUrgencyAdmin .22s steps(2,end) infinite;text-shadow:0 0 6px rgba(255,60,172,.08)}
+@keyframes timerUrgencyPlayer{
+  0%,100%{transform:translateX(0) scale(1)}
+  25%{transform:translateX(-1.5px) scale(1.015)}
+  50%{transform:translateX(1.5px) scale(1.03)}
+  75%{transform:translateX(-1px) scale(1.045)}
 }
 @keyframes timerUrgencyAdmin{
-  0%,100%{text-shadow:0 0 5px rgba(255,60,172,.08),1px 0 0 rgba(255,60,172,.08),-1px 0 0 rgba(124,77,255,.06)}
-  50%{text-shadow:0 0 8px rgba(255,60,172,.13),-1px 0 0 rgba(255,60,172,.08),1px 0 0 rgba(124,77,255,.06)}
+  0%,100%{transform:translateX(0) scale(1)}
+  50%{transform:translateX(.6px) scale(1.018)}
 }
 .time-progress{margin-top:8px}
 .time-progress>div{transition:width .18s linear}
+#pResults .reveal-answer{margin-top:5px;padding:14px 12px}
+#pResults .answer .song{font-size:clamp(19px,5.4vw,28px);line-height:1.08;margin:10px 0 3px}
+#pResults .answer .artist{font-size:13px}
+#pResults .answer-owner{font-size:clamp(32px,8vw,52px);margin-top:8px}
+#pResults .cover{width:116px;height:116px;border-radius:16px}
+#pResults .bars{margin-top:14px;gap:6px}
+#pResults .bar{height:19px}
+@media(max-width:560px){#pResults .reveal-wrap{padding-top:3px}#pResults .reveal-answer{padding:11px 10px}#pResults .cover{width:100px;height:100px;border-radius:14px}#pResults .bar-row{grid-template-columns:112px 1fr 25px;gap:7px}.bar-name{font-size:12px}.bar-n{font-size:11px}}
 .score-round-cell{display:flex;align-items:center;gap:9px;min-width:190px}
 .score-round-thumb{width:38px;height:38px;border-radius:9px;object-fit:cover;background:#17171e;flex:0 0 auto}
 .score-round-info{min-width:0}
@@ -404,11 +407,11 @@ const BUILTIN_SUPABASE_KEY='sb_publishable_LAPoiUr9RKn9jwIv90tFvw_O7ubV6NV';
 const PLAYER_KEY='jogo-musica-player-session-v1';
 const APP_YEAR=new Date().getFullYear();
 const APP_NAME='o derradeiro jogo da música';
-const APP_BUILD='v7.5.8';
+const APP_BUILD='v7.5.9';
 const AVATARS=['😀', '😎', '🤠', '🥳', '🤩', '😈', '👑', '🥸', '🪩', '🎸', '🎧', '🔥', '💿', '🕺', '💃', '🦄', '👽', '🤖', '🍒', '🌈', '⭐', '🫶', '💜', '❤️', '🐶', '🐱', '🦊', '🐸', '🐵', '🐼', '🐻', '🐨', '🐯', '🦁', '🐷', '🐮', '🐧', '🦉', '🦋', '🐢', '🐙', '🦈', '🦥', '🦦'];
 let selectedAvatar=localStorage.getItem('jdm_avatar')||'😀';
 let sb=null, channel=null, game=null, player=null, adminPassword='', adminMode=false, localVote=null, ticker=null, autoTimer=null, revealShown=false;
-let lastPublicRoundId=null, publicProgress={answered:0,total:0,missing_players:[]}, progressTimer=null, gameProgress={played:0,total:0};
+let lastPublicRoundId=null, voteConfirmedRoundId=null, publicProgress={answered:0,total:0,missing_players:[]}, progressTimer=null, gameProgress={played:0,total:0};
 let introShownGameId=null, adminBusy=false;
 let mappingPlayers=[], mappingOwners=[], selectedNextSongId=null;
 let pubState={players:[],round:null,rankings:[],roundResults:[]}, adminState={songs:[],players:[],round:null,game:null,rankings:[],finalResults:[],scoreboard:null};
@@ -509,7 +512,7 @@ async function refreshRoundProgress(){
   try{
     const p=rpcRow(await rpc('get_round_progress',{p_round_id:pubState.round.id}))||{};
     publicProgress={answered:Number(p.answered_count||0),total:Number(p.total_players||pubState.players.length||0),missing_players:[]};
-    if(player?.id && localVote!==null){
+    if(player?.id && voteConfirmedRoundId===pubState.round.id){
       try{
         const pp=rpcRow(await rpc('get_round_missing_players',{p_round_id:pubState.round.id,p_session_token:sessionToken()}))||{};
         publicProgress.missing_players=Array.isArray(pp.missing_players)?pp.missing_players:[];
@@ -550,7 +553,7 @@ async function refreshPublic(){
   }
   const gp=rpcRow(progRes)||{}; gameProgress={played:Number(gp.played_songs||0),total:Number(gp.total_songs||0)};
   const newRound=rRes.data?.[0]||null;
-  if(newRound?.id!==lastPublicRoundId){ localVote=null; revealShown=false; lastPublicRoundId=newRound?.id||null; }
+  if(newRound?.id!==lastPublicRoundId){ localVote=null; revealShown=false; lastPublicRoundId=newRound?.id||null; const saved=game?.id&&newRound?.id?sessionStorage.getItem('jdm_vote_confirmed_'+game.id):null; voteConfirmedRoundId=saved===newRound.id?saved:null; }
   pubState.players=pRes.data||[];
   pubState.round=newRound;
   pubState.rankings=rankRes.data||[];
@@ -587,9 +590,10 @@ function renderPublic(){
   }
   $('pLobby').classList.remove('hidden');
   $('pRoundTitle').textContent=`Rodada ${r.number} de ${gameProgress.total||'—'}`;
-  $('pVote').classList.toggle('hidden',r.status!=='voting'||!player||localVote!==null);
-  $('pWait').classList.toggle('hidden',r.status!=='voting'||localVote===null);
-  if(localVote!==null){
+  const hasVoted=r.status==='voting'&&voteConfirmedRoundId===r.id;
+  $('pVote').classList.toggle('hidden',r.status!=='voting'||!player||hasVoted);
+  $('pWait').classList.toggle('hidden',r.status!=='voting'||!hasVoted);
+  if(voteConfirmedRoundId===r.id){
     const answered=Math.min(publicProgress.answered,publicProgress.total);
     $('pWaitProgress').textContent=`${answered} de ${publicProgress.total} jogadores já responderam`;
     const missing=publicProgress.missing_players||[];
@@ -600,7 +604,7 @@ function renderPublic(){
     $('pEyebrow').textContent='VOTE AGORA';$('pMsg').textContent='Escolha de quem você acha que é a música.';renderVotePlayers();
     const sec=roundTimeRemaining(r);
     timerUI('pTimer',sec,r.duration_sec);updateTimeProgress('p',r);
-    if(sec===0 && localVote===null){
+    if(sec===0 && voteConfirmedRoundId!==r.id){
       $('pRoundTitle').textContent='Tempo esgotado';$('pMsg').textContent='';
       $('pVote').classList.add('hidden');$('pWait').classList.add('hidden');$('pResults').classList.add('hidden');
       setPlayerTimeoutState(true);
@@ -613,9 +617,9 @@ function renderPublic(){
 function resultRows(){const counts=Object.fromEntries((pubState.players||[]).map(p=>[p.id,{name:p.name,avatar:p.avatar_emoji||'😀',votes:0}]));(pubState.roundResults||[]).forEach(v=>{if(counts[v.choice_player_id])counts[v.choice_player_id].votes=v.vote_count||0});return Object.values(counts).sort((a,b)=>b.votes-a.votes||a.name.localeCompare(b.name,'pt-BR'))}
 function renderResults(reveal=false){
   const r=pubState.round;if(!r)return;
-  const rows=resultRows();const max=Math.max(0,...rows.map(x=>x.votes));const correctId=r.owner_revealed?(r.revealed_owner_player_id||((pubState.players||[]).find(p=>p.name===r.revealed_owner||p.name===r.revealed_owner_name)?.id)||null):null;
+  const rows=resultRows();const max=Math.max(0,...rows.map(x=>x.votes));const ownerName=String(r.revealed_owner||r.revealed_owner_name||'').trim().toLocaleLowerCase('pt-BR');const correctId=r.owner_revealed?(r.revealed_owner_player_id||((pubState.players||[]).find(p=>String(p.name||'').trim().toLocaleLowerCase('pt-BR')===ownerName)?.id)||null):null;
   const songHtml=(r.revealed_title||r.revealed_artist||r.revealed_album_art_url)?`<div class="reveal-answer">${r.revealed_album_art_url?`<img class="cover" src="${esc(r.revealed_album_art_url)}" onerror="this.style.display='none'">`:''}<div class="song">${esc(r.revealed_title||'')}</div><div class="artist">${esc(r.revealed_artist||'')}</div>${r.owner_revealed?`<div class="eyebrow" style="margin-top:18px">ERA DE</div><div class="answer-owner">${esc(r.revealed_owner||'')}</div>`:''}</div>`:'';
-  $('pResults').innerHTML=`<div class="round-results-hero"><div class="reveal-wrap"><div class="reveal">${songHtml}<div class="eyebrow" style="margin-top:28px">${r.owner_revealed?'RESPOSTA REVELADA':'RESULTADO DA RODADA'}</div><div class="tiny" style="margin-top:8px">Distribuição dos palpites</div><div class="bars">${rows.map(x=>`<div class="bar-row ${correctId&&x.id===correctId?'correct-bar':''}" data-correct="${correctId&&x.id===correctId?'true':'false'}"><div class="bar-name">${esc(x.avatar||'😀')} ${esc(x.name)}</div><div class="bar"><i style="width:${max?x.votes/max*100:0}%"></i></div><div class="bar-n">${x.votes}</div></div>`).join('')||'<div class="tiny">Ninguém votou.</div>'}</div></div></div></div>`;
+  $('pResults').innerHTML=`<div class="round-results-hero"><div class="reveal-wrap"><div class="reveal">${songHtml}<div class="eyebrow" style="margin-top:28px">${r.owner_revealed?'RESPOSTA REVELADA':'RESULTADO DA RODADA'}</div><div class="tiny" style="margin-top:8px">Distribuição dos palpites</div><div class="bars">${rows.map(x=>`<div class="bar-row ${correctId&&x.id===correctId?'correct-bar':''}" data-correct="${correctId&&x.id===correctId?'true':'false'}"><div class="bar-name">${esc(x.avatar||'😀')} ${esc(x.name)}</div><div class="bar"><i style="width:${max?x.votes/max*100:0}%;${correctId&&x.id===correctId?'background:linear-gradient(90deg,#16a34a,#4ade80,#86efac)!important;box-shadow:0 0 14px rgba(74,222,128,.28)':''}"></i></div><div class="bar-n">${x.votes}</div></div>`).join('')||'<div class="tiny">Ninguém votou.</div>'}</div></div></div></div>`;
   if(r.owner_revealed&&correctId&&!revealShown){revealShown=true;emojiRain(r.revealed_owner_avatar||'😀');}
 }
 
@@ -750,7 +754,7 @@ function scheduleAutomaticTransitions(){
     }
   },wait+150);
 }
-function startTicker(){clearInterval(ticker);ticker=setInterval(()=>{if(pubState.round?.status==='voting'){const r=pubState.round;const sec=roundTimeRemaining(r);timerUI('pTimer',sec);updateTimeProgress('p',r);if(adminMode){timerUI('aTimer',sec);updateTimeProgress('a',r)}const expired=sec===0&&localVote===null;setPlayerTimeoutState(expired);if(expired){$('pVote').classList.add('hidden');$('pWait').classList.add('hidden');$('pResults').classList.add('hidden');}}},250)}
+function startTicker(){clearInterval(ticker);ticker=setInterval(()=>{if(pubState.round?.status==='voting'){const r=pubState.round;const sec=roundTimeRemaining(r);timerUI('pTimer',sec);updateTimeProgress('p',r);if(adminMode){timerUI('aTimer',sec);updateTimeProgress('a',r)}const hasVoted=voteConfirmedRoundId===r.id;const expired=sec===0&&!hasVoted;setPlayerTimeoutState(expired);if(expired){$('pVote').classList.add('hidden');$('pWait').classList.add('hidden');$('pResults').classList.add('hidden');}}},250)}
 async function createOrEnterAdmin(){try{if(!sb && !(await connect()))return;const mode=$('adminMode').value,pass=$('adminPassword').value; if(pass.length<6)return alert('Use uma senha de pelo menos 6 caracteres.');let g;if(mode==='create'){const data=await rpc('create_game',{p_title:$('adminTitle').value.trim()||'O Derradeiro Jogo da Música — edição anual',p_password:pass});game={id:data[0].game_id,code:data[0].game_code};adminPassword=pass}else{const code=$('adminCode').value.trim().toUpperCase();const q=await rpc('get_game_by_code',{p_code:code});if(!q?.length)return alert('Sala não encontrada.');game={id:q[0].game_id,code:q[0].game_code};if(!(await rpc('verify_admin',{p_game_id:game.id,p_password:pass})))return alert('Senha administrativa inválida.');adminPassword=pass} adminMode=true;setSessionMode('admin');updateUrl();$('adminModal').classList.remove('show');showScreen('adminScreen');await subscribe();await refreshPublic();await refreshAdmin()}catch(e){$('adminMsg').textContent=e.message||'Erro administrativo.'}}
 async function startRound(){
   if(adminBusy)return;
@@ -768,7 +772,7 @@ async function startRound(){
     }
     if(gameProgress.total>0&&gameProgress.played>=gameProgress.total&&!(adminState.songs||[]).some(s=>!s.used))return alert('Todas as músicas do jogo já foram tocadas.');
     await rpc('admin_start_round',{p_game_id:game.id,p_password:adminPassword,p_song_id:id});
-    selectedNextSongId=null;localVote=null;lastPublicRoundId=null;revealShown=false;
+    selectedNextSongId=null;localVote=null;voteConfirmedRoundId=null;sessionStorage.removeItem('jdm_vote_confirmed_'+game.id);lastPublicRoundId=null;revealShown=false;
     await refreshPublic();await refreshAdmin();startTicker();
   }catch(e){alert(e.message)}
   finally{adminBusy=false;await refreshAdmin()}
@@ -797,7 +801,7 @@ async function revealOwner(){
 async function closeAdminSession(){if(!game)return;const code=game.code;try{if(channel){await sb.removeChannel(channel);channel=null}clearInterval(progressTimer);progressTimer=null;await rpc('admin_close_session',{p_game_id:game.id,p_password:adminPassword,p_code:code,p_confirmation:'ENCERRAR SESSÃO'});adminMode=false;adminPassword='';player=null;localVote=null;game=null;pubState={players:[],round:null,rankings:[],roundResults:[]};adminState={songs:[],players:[],round:null,game:null,rankings:[],finalResults:[],scoreboard:null,mappingAudit:null};$('closeSessionModal').classList.remove('show');setSessionMode('home');showScreen('homeScreen');history.replaceState({},'',location.pathname);alert('Sessão encerrada e removida da base.')}catch(e){$('closeSessionMsg').textContent=e.message||'Não foi possível encerrar a sessão.'}}
 async function endGame(){const r=adminState.round;if(r&&['voting','results','reveal'].includes(r.status))return alert('Encerre a rodada atual antes de terminar a partida.');try{await rpc('admin_start_final',{p_game_id:game.id,p_password:adminPassword});await refreshPublic();await refreshAdmin()}catch(e){alert(e.message)}}
 async function nextRank(){try{await rpc('admin_reveal_next_rank',{p_game_id:game.id,p_password:adminPassword});await refreshPublic();await refreshAdmin()}catch(e){alert(e.message)}}
-async function vote(){if(!localVote||!player||!pubState.round)return;if(!player.id)return alert('Sua sessão de jogador não possui um ID válido. Saia e entre novamente na sala.');try{await rpc('cast_vote',{p_round_id:pubState.round.id,p_player_id:player.id,p_session_token:sessionToken(),p_choice_player_id:localVote});$('pConfirm').disabled=true;$('pVoteState').textContent='Voto confirmado';await refreshRoundProgress();}catch(e){alert(e.message)}}
+async function vote(){if(!localVote||!player||!pubState.round)return;if(!player.id)return alert('Sua sessão de jogador não possui um ID válido. Saia e entre novamente na sala.');try{await rpc('cast_vote',{p_round_id:pubState.round.id,p_player_id:player.id,p_session_token:sessionToken(),p_choice_player_id:localVote});$('pConfirm').disabled=true;$('pVoteState').textContent='Voto confirmado';voteConfirmedRoundId=pubState.round.id;sessionStorage.setItem('jdm_vote_confirmed_'+game.id,pubState.round.id);renderPublic();await refreshRoundProgress();}catch(e){alert(e.message)}}
 function parseCsv(t){const first=t.split(/\r?\n/).find(x=>x.trim())||'';const delim=(first.match(/;/g)||[]).length>(first.match(/,/g)||[]).length?';':',';const out=[];let row=[],cell='',q=false;for(let i=0;i<t.length;i++){const c=t[i],n=t[i+1];if(c==='"'&&q&&n==='"'){cell+='"';i++;continue}if(c==='"'){q=!q;continue}if(c===delim&&!q){row.push(cell);cell='';continue}if((c==='\n'||c==='\r')&&!q){if(c==='\r'&&n==='\n')i++;row.push(cell);out.push(row);row=[];cell='';continue}cell+=c}if(cell||row.length){row.push(cell);out.push(row)}return out}
 function normalizeSpotifyUrl(url){let u=url.trim();if(!/^https?:\/\/(open\.spotify\.com|spotify\.link)\//i.test(u))throw new Error('Use um link público do Spotify.');return u}
 async function resolveSpotify(url){
@@ -968,7 +972,7 @@ $('addSong').onclick=async()=>{try{const url=$('sSpotify').value.trim(),owner=$(
 $('importBtn').onclick=()=>$('csvFile').click();$('csvFile').onchange=e=>{if(e.target.files[0])importCsv(e.target.files[0]).catch(err=>alert(err.message))};
 $('copyRoom').onclick=async()=>{try{await navigator.clipboard.writeText(game.code);$('copyRoom').textContent='Copiado ✓';setTimeout(()=>$('copyRoom').textContent='Copiar código',1000)}catch{alert(game.code)}};
 $('applyMapping').onclick=async()=>{try{const n=Math.min(mappingPlayers.length,mappingOwners.length);if(!n)return alert('Não há itens para mapear.');for(let i=0;i<n;i++){const pid=mappingPlayers[i],owner=mappingOwners[i];for(const s of (adminState.songs||[]).filter(x=>String(x.owner||'').trim()===String(owner||'').trim())){await rpc('admin_map_song_owner',{p_game_id:game.id,p_password:adminPassword,p_song_id:s.id,p_player_id:pid})}}await refreshAdmin();const a=adminState.mappingAudit;alert(a&&a.unmapped_songs>0?`Mapeamento aplicado, mas ${a.unmapped_songs} música(s) ainda estão sem dono mapeado.`:'Mapeamento aplicado e conferido no banco.')}catch(e){alert(e.message)}};
-$('exitBtn').onclick=()=>{$('exitModal').classList.add('show')};$('cancelExit').onclick=()=>$('exitModal').classList.remove('show');$('confirmExit').onclick=()=>{ $('exitModal').classList.remove('show');clearInterval(progressTimer);progressTimer=null;adminMode=false;adminPassword='';player=null;localVote=null;game=null;setSessionMode('home');showScreen('homeScreen');history.replaceState({},'',location.pathname)};$('closeSessionBtn').onclick=()=>{if(!game)return;$('closeSessionModal').classList.add('show');$('closeCheck').checked=false;$('closeCode').value='';$('closePhrase').value='';$('confirmCloseSession').disabled=true;$('closeSessionMsg').textContent=''};$('cancelCloseSession').onclick=()=>{$('closeSessionModal').classList.remove('show')};function syncCloseSession(){const ok=$('closeCheck').checked&&$('closeCode').value.trim().toUpperCase()===String(game?.code||'').toUpperCase()&&$('closePhrase').value.trim().toUpperCase()==='ENCERRAR SESSÃO';$('confirmCloseSession').disabled=!ok}$('closeCheck').onchange=syncCloseSession;$('closeCode').oninput=syncCloseSession;$('closePhrase').oninput=syncCloseSession;$('confirmCloseSession').onclick=closeAdminSession;
+$('exitBtn').onclick=()=>{$('exitModal').classList.add('show')};$('cancelExit').onclick=()=>$('exitModal').classList.remove('show');$('confirmExit').onclick=()=>{ $('exitModal').classList.remove('show');clearInterval(progressTimer);progressTimer=null;adminMode=false;adminPassword='';player=null;localVote=null;voteConfirmedRoundId=null;game=null;setSessionMode('home');showScreen('homeScreen');history.replaceState({},'',location.pathname)};$('closeSessionBtn').onclick=()=>{if(!game)return;$('closeSessionModal').classList.add('show');$('closeCheck').checked=false;$('closeCode').value='';$('closePhrase').value='';$('confirmCloseSession').disabled=true;$('closeSessionMsg').textContent=''};$('cancelCloseSession').onclick=()=>{$('closeSessionModal').classList.remove('show')};function syncCloseSession(){const ok=$('closeCheck').checked&&$('closeCode').value.trim().toUpperCase()===String(game?.code||'').toUpperCase()&&$('closePhrase').value.trim().toUpperCase()==='ENCERRAR SESSÃO';$('confirmCloseSession').disabled=!ok}$('closeCheck').onchange=syncCloseSession;$('closeCode').oninput=syncCloseSession;$('closePhrase').oninput=syncCloseSession;$('confirmCloseSession').onclick=closeAdminSession;
 $('endGameBtn').onclick=()=>{$('confirmEndModal').classList.add('show');$('endCheck').checked=false;$('endPhrase').value='';$('confirmEndGame').disabled=true};$('cancelEndGame').onclick=()=>$('confirmEndModal').classList.remove('show');function syncEndButton(){$('confirmEndGame').disabled=!($('endCheck').checked&&$('endPhrase').value.trim().toUpperCase()==='ENCERRAR')}$('endCheck').onchange=syncEndButton;$('endPhrase').oninput=syncEndButton;$('confirmEndGame').onclick=async()=>{ $('confirmEndModal').classList.remove('show');await endGame()};$('nextRankBtn').onclick=nextRank;$('exportImgBtn').onclick=exportImage;
 document.querySelectorAll('.admin-tab').forEach(b=>b.onclick=()=>{document.querySelectorAll('.admin-tab').forEach(x=>x.classList.remove('active'));b.classList.add('active');document.querySelectorAll('.tab-pane').forEach(x=>x.classList.add('hidden'));$('tab-'+b.dataset.tab).classList.remove('hidden');if(b.dataset.tab==='players')renderMapping()});
 async function boot(){
