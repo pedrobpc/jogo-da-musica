@@ -427,7 +427,7 @@
 <div class="modal" id="exitModal"><div class="modal-card"><div class="eyebrow">SAIR DA SALA</div><h2 style="margin:6px 0">Tem certeza?</h2><p class="muted">Você poderá entrar novamente usando o mesmo nome.</p><div class="actions"><button class="btn danger" id="confirmExit">Sair</button><button class="btn secondary" id="cancelExit">Continuar na sala</button></div></div></div>
 <div class="modal" id="adminModal"><div class="modal-card"><div class="eyebrow">ADMINISTRADOR</div><h2 style="margin:6px 0 7px">Entrar ou criar uma sala</h2><div class="field"><label>OPÇÃO</label><select id="adminMode"><option value="create">Criar nova sala</option><option value="existing">Entrar na sala existente</option></select></div><div class="field" id="adminCodeWrap" style="margin-top:10px"><label>CÓDIGO DA SALA</label><input id="adminCode" maxlength="5" placeholder="Ex.: CASA"/></div><div class="field" style="margin-top:10px"><label>SENHA ADMINISTRATIVA</label><input id="adminPassword" type="password" autocomplete="off" placeholder="Senha da partida"></div><div class="field" id="adminTitleWrap" style="margin-top:10px"><label>NOME DA PARTIDA</label><input id="adminTitle" maxlength="70"/></div><div class="actions" style="margin-top:14px"><button class="btn" id="adminGo">Continuar</button><button class="btn secondary" id="closeAdmin">Cancelar</button></div><div id="adminMsg" class="tiny" style="margin-top:10px"></div></div></div>
 <div class="modal" id="confirmEndModal"><div class="modal-card"><div class="eyebrow">DUPLA VERIFICAÇÃO</div><h2 style="margin:6px 0">Encerrar a partida?</h2><p class="muted">Depois disso, o jogo entra no ranking final e você não poderá iniciar novas rodadas. Para confirmar, marque a caixa e digite <b>ENCERRAR</b>.</p><label style="display:flex;gap:9px;align-items:center;font-size:13px;color:#ddd"><input type="checkbox" id="endCheck"> Eu conferi que todas as músicas foram tocadas.</label><div class="field" style="margin-top:12px"><label>CONFIRMAÇÃO</label><input id="endPhrase" placeholder="ENCERRAR" autocomplete="off"></div><div class="actions" style="margin-top:14px"><button class="btn danger" id="confirmEndGame" disabled>Encerrar definitivamente</button><button class="btn secondary" id="cancelEndGame">Voltar</button></div></div></div>
-<div class="modal" id="closeSessionModal"><div class="modal-card"><div class="eyebrow">ENCERRAR SESSÃO</div><h2 style="margin:6px 0">Apagar esta sala?</h2><p class="muted">Isso remove definitivamente da base a sala, jogadores, músicas, votos, rodadas e resultados. Esta ação não pode ser desfeita.</p><div class="notice" style="margin-top:12px">São necessárias <b>3 verificações</b> para concluir.</div><label class="verify-row"><input type="checkbox" id="closeCheck"> <span>Eu entendo que todos os dados desta sessão serão apagados.</span></label><div class="field" style="margin-top:12px"><label>DIGITE O CÓDIGO DA SALA</label><input id="closeCode" maxlength="5" autocomplete="off" placeholder="Ex.: CASA"/></div><div class="field" style="margin-top:12px"><label>DIGITE ENCERRAR SESSÃO</label><input id="closePhrase" autocomplete="off" placeholder="ENCERRAR SESSÃO"/></div><div class="actions" style="margin-top:14px"><button class="btn danger" id="confirmCloseSession" disabled>Apagar sessão definitivamente</button><button class="btn secondary" id="cancelCloseSession">Cancelar</button></div><div id="closeSessionMsg" class="tiny" style="margin-top:10px"></div></div></div>
+<div class="modal" id="closeSessionModal"><div class="modal-card"><div class="eyebrow">ENCERRAR SESSÃO</div><h2 style="margin:6px 0">Apagar esta sala?</h2><p class="muted">A sala e todos os seus dados serão removidos definitivamente da base. Esta ação não pode ser desfeita.</p><div class="notice" style="margin-top:12px">A confirmação será feita em <b>duas etapas</b>.</div><div class="actions" style="margin-top:14px"><button class="btn danger" id="confirmCloseSession">Apagar sessão definitivamente</button><button class="btn secondary" id="cancelCloseSession">Cancelar</button></div><div id="closeSessionMsg" class="tiny" style="margin-top:10px"></div></div></div>
 <div id="startIntro" class="start-intro hidden" aria-hidden="true">
   <div class="start-intro-word" id="startIntroWord">TE PREPARA</div>
 </div>
@@ -441,7 +441,7 @@ const BUILTIN_SUPABASE_KEY='sb_publishable_LAPoiUr9RKn9jwIv90tFvw_O7ubV6NV';
 const PLAYER_KEY='jogo-musica-player-session-v1';
 const APP_YEAR=new Date().getFullYear();
 const APP_NAME='o derradeiro jogo da música';
-const APP_BUILD='v7.5.10';
+const APP_BUILD='v7.5.11';
 const AVATARS=['😀', '😎', '🤠', '🥳', '🤩', '😈', '👑', '🥸', '🪩', '🎸', '🎧', '🔥', '💿', '🕺', '💃', '🦄', '👽', '🤖', '🍒', '🌈', '⭐', '🫶', '💜', '❤️', '🐶', '🐱', '🦊', '🐸', '🐵', '🐼', '🐻', '🐨', '🐯', '🦁', '🐷', '🐮', '🐧', '🦉', '🦋', '🐢', '🐙', '🦈', '🦥', '🦦'];
 let selectedAvatar=localStorage.getItem('jdm_avatar')||'😀';
 let sb=null, channel=null, game=null, player=null, adminPassword='', adminMode=false, localVote=null, ticker=null, autoTimer=null, revealShown=false;
@@ -449,6 +449,7 @@ let lastPublicRoundId=null, voteConfirmedRoundId=null, publicProgress={answered:
 let introShownGameId=null, adminBusy=false;
 let mappingPlayers=[], mappingOwners=[], selectedNextSongId=null;
 let pubState={players:[],round:null,rankings:[],roundResults:[]}, adminState={songs:[],players:[],round:null,game:null,rankings:[],finalResults:[],scoreboard:null};
+let finalRainSeenRanks=new Set();
 const $=id=>document.getElementById(id);
 function rpcRow(data){ return Array.isArray(data) ? (data[0]||null) : (data||null); }
 function sanitizePublicRound(round){
@@ -708,7 +709,30 @@ function renderFinal(){
   const list=[...(pubState.rankings||[])].sort((a,b)=>b.rank-a.rank);
   const avatarMap=Object.fromEntries((pubState.players||[]).map(p=>[p.id,p.avatar_emoji||'😀']));
   $('pFinal').classList.remove('hidden');
-  $('pFinal').innerHTML=`<div class="card"><div class="eyebrow">RESULTADO FINAL</div><div class="final-title">Do último ao campeão</div><div class="rank-list">${list.map(x=>`<div class="rank-card"><div class="rank-pos">${x.rank}º</div><div><div class="rank-name">${esc(avatarMap[x.player_id]||x.avatar_emoji||'😀')} ${esc(x.player_name||x.name||'')}</div></div><div class="rank-score">${x.score}<small>acertos</small></div></div>`).join('')||'<div class="tiny">Aguardando a primeira revelação…</div>'}</div></div>`;
+  $('pFinal').innerHTML=`<div class="card"><div class="eyebrow">RESULTADO FINAL</div><div class="rank-list">${list.map(x=>`<div class="rank-card"><div class="rank-pos">${x.rank}º</div><div><div class="rank-name">${esc(avatarMap[x.player_id]||x.avatar_emoji||'😀')} ${esc(x.player_name||x.name||'')}</div></div><div class="rank-score">${x.score}<small>acertos</small></div></div>`).join('')||'<div class="tiny">Aguardando a primeira revelação…</div>'}</div></div>`;
+  // Celebra somente novas colocações publicadas; não repete a chuva a cada refresh.
+  for(const x of list){
+    const key=String(x.rank);
+    if(!finalRainSeenRanks.has(key)){
+      finalRainSeenRanks.add(key);
+      emojiRainFinal(x,Number(x.rank)===1);
+      break;
+    }
+  }
+}
+function emojiRainFinal(rank,champion){
+  const box=$('emojiRain'); if(!box)return;
+  box.innerHTML='';
+  const base=rank?.avatar_emoji||'🎉';
+  const pool=champion?['🎆','🎇','✨','⭐','🏆','🎉',base]:[base,'🎉','✨','🥳','👏','⭐'];
+  const count=champion?110:80;
+  for(let i=0;i<count;i++){
+    const d=document.createElement('span'); d.className='emoji-drop'; d.textContent=pool[Math.floor(Math.random()*pool.length)];
+    d.style.left=Math.random()*100+'%'; d.style.animationDelay=(Math.random()*1.6)+'s';
+    d.style.setProperty('--dx',(Math.random()*360-180)+'px'); d.style.setProperty('--rot',(Math.random()*1000-500)+'deg');
+    d.style.fontSize=(champion?(22+Math.random()*28):(20+Math.random()*22))+'px'; box.appendChild(d);
+  }
+  setTimeout(()=>box.innerHTML='',6200);
 }
 
 function renderAdmin(){
@@ -827,7 +851,7 @@ function scheduleAutomaticTransitions(){
   },wait+150);
 }
 function startTicker(){clearInterval(ticker);ticker=setInterval(()=>{if(pubState.round?.status==='voting'){const r=pubState.round;const sec=roundTimeRemaining(r);timerUI('pTimer',sec);updateTimeProgress('p',r);if(adminMode){timerUI('aTimer',sec);updateTimeProgress('a',r)}const hasVoted=voteConfirmedRoundId===r.id;const expired=sec===0&&!hasVoted;setPlayerTimeoutState(expired);if(expired){$('pVote').classList.add('hidden');$('pWait').classList.add('hidden');$('pResults').classList.add('hidden');}}},250)}
-async function createOrEnterAdmin(){try{if(!sb && !(await connect()))return;const mode=$('adminMode').value,pass=$('adminPassword').value; if(pass.length<6)return alert('Use uma senha de pelo menos 6 caracteres.');let g;if(mode==='create'){const data=await rpc('create_game',{p_title:$('adminTitle').value.trim()||'O Derradeiro Jogo da Música — edição anual',p_password:pass});game={id:data[0].game_id,code:data[0].game_code};adminPassword=pass}else{const code=$('adminCode').value.trim().toUpperCase();const q=await rpc('get_game_by_code',{p_code:code});if(!q?.length)return alert('Sala não encontrada.');game={id:q[0].game_id,code:q[0].game_code};if(!(await rpc('verify_admin',{p_game_id:game.id,p_password:pass})))return alert('Senha administrativa inválida.');adminPassword=pass} adminMode=true;setSessionMode('admin');updateUrl();$('adminModal').classList.remove('show');showScreen('adminScreen');await subscribe();await refreshPublic();await refreshAdmin()}catch(e){$('adminMsg').textContent=e.message||'Erro administrativo.'}}
+async function createOrEnterAdmin(){try{if(!sb && !(await connect()))return;const mode=$('adminMode').value,pass=$('adminPassword').value; if(pass.length<6)return alert('Use uma senha de pelo menos 6 caracteres.');let g;if(mode==='create'){const data=await rpc('create_game',{p_title:$('adminTitle').value.trim()||'O Derradeiro Jogo da Música — edição anual',p_password:pass});if(!data?.[0]?.game_id||!data?.[0]?.game_code)throw new Error('A nova sala foi criada, mas o Supabase não retornou seus dados.');if(channel){await sb.removeChannel(channel);channel=null}clearInterval(progressTimer);progressTimer=null;selectedNextSongId=null;mappingPlayers=[];mappingOwners=[];lastPublicRoundId=null;voteConfirmedRoundId=null;finalRainSeenRanks=new Set();pubState={players:[],round:null,rankings:[],roundResults:[]};adminState={songs:[],players:[],round:null,game:null,rankings:[],finalResults:[],scoreboard:null,mappingAudit:null};game={id:data[0].game_id,code:data[0].game_code};adminPassword=pass}else{const code=$('adminCode').value.trim().toUpperCase();const q=await rpc('get_game_by_code',{p_code:code});if(!q?.length)return alert('Sala não encontrada.');game={id:q[0].game_id,code:q[0].game_code};if(!(await rpc('verify_admin',{p_game_id:game.id,p_password:pass})))return alert('Senha administrativa inválida.');adminPassword=pass} adminMode=true;setSessionMode('admin');updateUrl();$('adminModal').classList.remove('show');showScreen('adminScreen');await subscribe();await refreshPublic();await refreshAdmin()}catch(e){$('adminMsg').textContent=e.message||'Erro administrativo.'}}
 async function startRound(){
   if(adminBusy)return;
   adminBusy=true;renderAdmin();
@@ -870,7 +894,29 @@ async function revealOwner(){
   catch(e){alert(e.message)}
   finally{adminBusy=false;await refreshAdmin()}
 }
-async function closeAdminSession(){if(!game)return;const code=game.code;try{if(channel){await sb.removeChannel(channel);channel=null}clearInterval(progressTimer);progressTimer=null;await rpc('admin_close_session',{p_game_id:game.id,p_password:adminPassword,p_code:code,p_confirmation:'ENCERRAR SESSÃO'});adminMode=false;adminPassword='';player=null;localVote=null;game=null;pubState={players:[],round:null,rankings:[],roundResults:[]};adminState={songs:[],players:[],round:null,game:null,rankings:[],finalResults:[],scoreboard:null,mappingAudit:null};$('closeSessionModal').classList.remove('show');setSessionMode('home');showScreen('homeScreen');history.replaceState({},'',location.pathname);alert('Sessão encerrada e removida da base.')}catch(e){$('closeSessionMsg').textContent=e.message||'Não foi possível encerrar a sessão.'}}
+async function closeAdminSession(){
+  if(!game)return;
+  const roomCode=String(game.code||'').toUpperCase();
+  const first=window.confirm(`ENCERRAR SESSÃO\n\nVocê está prestes a apagar definitivamente a sala ${roomCode} e todos os dados dela.\n\nDeseja continuar?`);
+  if(!first)return;
+  const second=window.confirm(`CONFIRMAÇÃO FINAL\n\nA sala ${roomCode}, jogadores, músicas, votos, rodadas e resultados serão apagados permanentemente.\n\nConfirma a exclusão definitiva?`);
+  if(!second)return;
+  try{
+    $('confirmCloseSession').disabled=true;
+    if(channel){await sb.removeChannel(channel);channel=null}
+    clearInterval(progressTimer);progressTimer=null;
+    await rpc('admin_close_session',{p_game_id:game.id,p_password:adminPassword});
+    adminMode=false;adminPassword='';player=null;localVote=null;game=null;finalRainSeenRanks=new Set();
+    pubState={players:[],round:null,rankings:[],roundResults:[]};
+    adminState={songs:[],players:[],round:null,game:null,rankings:[],finalResults:[],scoreboard:null,mappingAudit:null};
+    $('closeSessionModal').classList.remove('show');setSessionMode('home');showScreen('homeScreen');history.replaceState({},'',location.pathname);
+    alert('Sessão encerrada e removida da base.');
+  }catch(e){
+    $('confirmCloseSession').disabled=false;
+    $('closeSessionMsg').textContent=e.message||'Não foi possível encerrar a sessão.';
+  }
+}
+
 async function endGame(){const r=adminState.round;if(r&&['voting','results','reveal'].includes(r.status))return alert('Encerre a rodada atual antes de terminar a partida.');try{await rpc('admin_start_final',{p_game_id:game.id,p_password:adminPassword});await refreshPublic();await refreshAdmin()}catch(e){alert(e.message)}}
 async function nextRank(){try{await rpc('admin_reveal_next_rank',{p_game_id:game.id,p_password:adminPassword});await refreshPublic();await refreshAdmin()}catch(e){alert(e.message)}}
 async function vote(){if(!localVote||!player||!pubState.round)return;if(!player.id)return alert('Sua sessão de jogador não possui um ID válido. Saia e entre novamente na sala.');try{await rpc('cast_vote',{p_round_id:pubState.round.id,p_player_id:player.id,p_session_token:sessionToken(),p_choice_player_id:localVote});$('pConfirm').disabled=true;$('pVoteState').textContent='Voto confirmado';voteConfirmedRoundId=pubState.round.id;sessionStorage.setItem('jdm_vote_confirmed_'+game.id,pubState.round.id);renderPublic();await refreshRoundProgress();}catch(e){alert(e.message)}}
@@ -1044,7 +1090,7 @@ $('addSong').onclick=async()=>{try{const url=$('sSpotify').value.trim(),owner=$(
 $('importBtn').onclick=()=>$('csvFile').click();$('csvFile').onchange=e=>{if(e.target.files[0])importCsv(e.target.files[0]).catch(err=>alert(err.message))};
 $('copyRoom').onclick=async()=>{try{await navigator.clipboard.writeText(game.code);$('copyRoom').textContent='Copiado ✓';setTimeout(()=>$('copyRoom').textContent='Copiar código',1000)}catch{alert(game.code)}};
 $('applyMapping').onclick=async()=>{try{const n=Math.min(mappingPlayers.length,mappingOwners.length);if(!n)return alert('Não há itens para mapear.');for(let i=0;i<n;i++){const pid=mappingPlayers[i],owner=mappingOwners[i];for(const s of (adminState.songs||[]).filter(x=>String(x.owner||'').trim()===String(owner||'').trim())){await rpc('admin_map_song_owner',{p_game_id:game.id,p_password:adminPassword,p_song_id:s.id,p_player_id:pid})}}await refreshAdmin();const a=adminState.mappingAudit;alert(a&&a.unmapped_songs>0?`Mapeamento aplicado, mas ${a.unmapped_songs} música(s) ainda estão sem dono mapeado.`:'Mapeamento aplicado e conferido no banco.')}catch(e){alert(e.message)}};
-$('exitBtn').onclick=()=>{$('exitModal').classList.add('show')};$('cancelExit').onclick=()=>$('exitModal').classList.remove('show');$('confirmExit').onclick=()=>{ $('exitModal').classList.remove('show');clearInterval(progressTimer);progressTimer=null;adminMode=false;adminPassword='';player=null;localVote=null;voteConfirmedRoundId=null;game=null;setSessionMode('home');showScreen('homeScreen');history.replaceState({},'',location.pathname)};$('closeSessionBtn').onclick=()=>{if(!game)return;$('closeSessionModal').classList.add('show');$('closeCheck').checked=false;$('closeCode').value='';$('closePhrase').value='';$('confirmCloseSession').disabled=true;$('closeSessionMsg').textContent=''};$('cancelCloseSession').onclick=()=>{$('closeSessionModal').classList.remove('show')};function syncCloseSession(){const ok=$('closeCheck').checked&&$('closeCode').value.trim().toUpperCase()===String(game?.code||'').toUpperCase()&&$('closePhrase').value.trim().toUpperCase()==='ENCERRAR SESSÃO';$('confirmCloseSession').disabled=!ok}$('closeCheck').onchange=syncCloseSession;$('closeCode').oninput=syncCloseSession;$('closePhrase').oninput=syncCloseSession;$('confirmCloseSession').onclick=closeAdminSession;
+$('exitBtn').onclick=()=>{$('exitModal').classList.add('show')};$('cancelExit').onclick=()=>$('exitModal').classList.remove('show');$('confirmExit').onclick=()=>{ $('exitModal').classList.remove('show');clearInterval(progressTimer);progressTimer=null;adminMode=false;adminPassword='';player=null;localVote=null;voteConfirmedRoundId=null;game=null;setSessionMode('home');showScreen('homeScreen');history.replaceState({},'',location.pathname)};$('closeSessionBtn').onclick=()=>{if(!game)return;$('closeSessionMsg').textContent='';$('confirmCloseSession').disabled=false;$('closeSessionModal').classList.add('show')};$('cancelCloseSession').onclick=()=>$('closeSessionModal').classList.remove('show');$('confirmCloseSession').onclick=closeAdminSession;
 $('endGameBtn').onclick=()=>{$('confirmEndModal').classList.add('show');$('endCheck').checked=false;$('endPhrase').value='';$('confirmEndGame').disabled=true};$('cancelEndGame').onclick=()=>$('confirmEndModal').classList.remove('show');function syncEndButton(){$('confirmEndGame').disabled=!($('endCheck').checked&&$('endPhrase').value.trim().toUpperCase()==='ENCERRAR')}$('endCheck').onchange=syncEndButton;$('endPhrase').oninput=syncEndButton;$('confirmEndGame').onclick=async()=>{ $('confirmEndModal').classList.remove('show');await endGame()};$('nextRankBtn').onclick=nextRank;$('exportImgBtn').onclick=exportImage;
 document.querySelectorAll('.admin-tab').forEach(b=>b.onclick=()=>{document.querySelectorAll('.admin-tab').forEach(x=>x.classList.remove('active'));b.classList.add('active');document.querySelectorAll('.tab-pane').forEach(x=>x.classList.add('hidden'));$('tab-'+b.dataset.tab).classList.remove('hidden');if(b.dataset.tab==='players')renderMapping()});
 async function boot(){
