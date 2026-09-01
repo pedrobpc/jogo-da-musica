@@ -84,13 +84,22 @@
 <canvas id="shareCanvas" class="share-canvas" width="1600" height="2000"></canvas>
 
 <script>
-const SB_CONFIG_KEY='jogo-musica-supabase-config-v1';
+const SB_CONFIG_KEY='jdm_sb_config';
+const BUILTIN_SUPABASE_URL='https://xjkzichxwicrsnypbgxi.supabase.co';
+const BUILTIN_SUPABASE_KEY='sb_publishable_LAPoiUr9RKn9jwIv90tFvw_O7ubV6NV';
 const PLAYER_KEY='jogo-musica-player-session-v1';
 let sb=null, channel=null, game=null, player=null, adminPassword='', adminMode=false, localVote=null, ticker=null, autoTimer=null;
 let pubState={players:[],round:null,rankings:[],roundResults:[]}, adminState={songs:[],players:[],round:null,game:null,rankings:[],finalResults:[]};
 const $=id=>document.getElementById(id); const clone=x=>JSON.parse(JSON.stringify(x));
 const esc=s=>String(s??'').replace(/[&<>'"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[m]));
-function cfg(){try{return JSON.parse(localStorage.getItem(SB_CONFIG_KEY)||'null')}catch{return null}}
+function cfg(){
+  const builtinUrl=BUILTIN_SUPABASE_URL;
+  const builtinKey=BUILTIN_SUPABASE_KEY;
+  if(builtinUrl && builtinKey && !builtinUrl.startsWith('__') && !builtinKey.startsWith('__')){
+    return {url:builtinUrl,key:builtinKey};
+  }
+  try{return JSON.parse(localStorage.getItem(SB_CONFIG_KEY)||'null')}catch{return null}
+}
 function setConn(on,msg){$('connDot').className='dot '+(on?'on':'off');$('connText').textContent=msg}
 function showScreen(id){document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active'));$(id).classList.add('active');window.scrollTo({top:0,behavior:'smooth'})}
 function sessionToken(){let x=localStorage.getItem(PLAYER_KEY); if(!x){x=crypto.randomUUID();localStorage.setItem(PLAYER_KEY,x)} return x}
@@ -171,7 +180,10 @@ async function importCsv(file){const text=await file.text();const rows=parseCsv(
 function downloadBlob(name,blob){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
 function exportImage(){const c=$('shareCanvas'),ctx=c.getContext('2d');const W=c.width,H=c.height;ctx.fillStyle='#06060a';ctx.fillRect(0,0,W,H);const grad=ctx.createLinearGradient(0,0,W,H);grad.addColorStop(0,'#ff3cac');grad.addColorStop(.55,'#7c4dff');grad.addColorStop(1,'#22d3ee');ctx.globalAlpha=.22;ctx.fillStyle=grad;ctx.beginPath();ctx.arc(130,180,340,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.arc(1460,350,300,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1;ctx.fillStyle='#f7f7fb';ctx.font='900 82px Inter, Arial';ctx.fillText('JOGO DA MÚSICA',90,150);ctx.fillStyle='#a5a6b0';ctx.font='600 26px Inter, Arial';ctx.fillText((game?.title||'Edição anual').toUpperCase(),94,195);ctx.fillStyle='#ff8bcb';ctx.font='800 23px Inter, Arial';ctx.fillText(`SALA ${game?.code||''}`,94,250);let y=345;ctx.fillStyle='#f7f7fb';ctx.font='850 32px Inter, Arial';ctx.fillText('CLASSIFICAÇÃO FINAL',94,y);y+=55;const list=[...(adminState.finalResults||[])].sort((a,b)=>a.rank-b.rank);list.forEach((x,i)=>{const yy=y+i*82;ctx.fillStyle=i<3?'#f7f7fb':'#d1d1d8';ctx.font=`900 ${i<3?42:34}px Inter, Arial`;ctx.fillText(`${x.rank}º`,100,yy);ctx.font='800 30px Inter, Arial';ctx.fillText(x.name||x.player_name,210,yy);ctx.fillStyle='#9ea0ab';ctx.font='700 23px Inter, Arial';ctx.fillText(`${x.score} acertos`,1220,yy)});const bottom=Math.min(H-340,y+list.length*82+70);ctx.strokeStyle='rgba(255,255,255,.1)';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(90,bottom);ctx.lineTo(W-90,bottom);ctx.stroke();ctx.fillStyle='#f7f7fb';ctx.font='850 28px Inter, Arial';ctx.fillText('ESTATÍSTICAS',94,bottom+62);const totalRounds=(adminState.game?.round_no||0);const totalVotes=pubState.round?.total_votes||0;ctx.fillStyle='#a9aab5';ctx.font='700 24px Inter, Arial';ctx.fillText(`${totalRounds} rodadas`,95,bottom+106);ctx.fillText(`${totalVotes} votos na última rodada`,330,bottom+106);ctx.fillStyle='#7f818d';ctx.font='600 18px Inter, Arial';ctx.fillText('Feito para uma noite de música, amigos e suspeitas.',94,H-100);c.toBlob(b=>downloadBlob(`jogo-da-musica-${game?.code||'resultado'}.png`,b),'image/png')}
 
-$('configBtn').onclick=()=>{$('configModal').classList.add('show');const c=cfg();if(c){$('sbUrl').value=c.url||'';$('sbKey').value=c.key||''}};$('closeConfig').onclick=()=>$('configModal').classList.remove('show');$('saveConfig').onclick=async()=>{const url=$('sbUrl').value.trim(),key=$('sbKey').value.trim();if(!url||!key)return alert('Preencha os dois campos.');localStorage.setItem(SB_CONFIG_KEY,JSON.stringify({url,key}));if(await connect()){$('configMsg').textContent='Conectado.';setTimeout(()=>$('configModal').classList.remove('show'),500)}};
+if(BUILTIN_SUPABASE_URL && BUILTIN_SUPABASE_KEY && !BUILTIN_SUPABASE_URL.startsWith('__') && !BUILTIN_SUPABASE_KEY.startsWith('__')) {
+  const cb=$('configBtn'); if(cb) cb.style.display='none';
+}
+$('configBtn').onclick=()=>$('configModal').classList.remove('show');$('saveConfig').onclick=async()=>{const url=$('sbUrl').value.trim(),key=$('sbKey').value.trim();if(!url||!key)return alert('Preencha os dois campos.');localStorage.setItem(SB_CONFIG_KEY,JSON.stringify({url,key}));if(await connect()){$('configMsg').textContent='Conectado.';setTimeout(()=>$('configModal').classList.remove('show'),500)}};
 $('homeBtn').onclick=()=>showScreen('homeScreen');$('joinBtn').onclick=joinRoom;$('roomCode').value=roomFromUrl();
 $('adminBtn').onclick=()=>{$('adminModal').classList.add('show');$('adminMode').dispatchEvent(new Event('change'))};$('closeAdmin').onclick=()=>$('adminModal').classList.remove('show');$('adminMode').onchange=()=>{const create=$('adminMode').value==='create';$('adminCodeWrap').classList.toggle('hidden',create);$('adminTitleWrap').classList.toggle('hidden',!create)};$('adminGo').onclick=createOrEnterAdmin;
 $('startBtn').onclick=startRound;$('plus15').onclick=plus15;$('endBtn').onclick=endRound;$('forceReveal').onclick=forceReveal;$('pConfirm').onclick=vote;$('songSelect').onchange=renderSongPreview;$('addSong').onclick=async()=>{try{await rpc('admin_add_song',{p_game_id:game.id,p_password:adminPassword,p_title:$('sTitle').value.trim(),p_artist:$('sArtist').value.trim(),p_owner:$('sOwner').value.trim(),p_album_art_url:$('sArt').value.trim(),p_spotify_url:$('sSpotify').value.trim()});['sTitle','sArtist','sOwner','sArt','sSpotify'].forEach(id=>$(id).value='');await refreshAdmin()}catch(e){alert(e.message)}};$('importBtn').onclick=()=>$('csvFile').click();$('csvFile').onchange=e=>{if(e.target.files[0])importCsv(e.target.files[0])};
