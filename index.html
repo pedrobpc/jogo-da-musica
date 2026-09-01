@@ -225,7 +225,15 @@ async function nextRank(){try{await rpc('admin_reveal_next_rank',{p_game_id:game
 async function vote(){if(!localVote||!player||!pubState.round)return;try{await rpc('cast_vote',{p_round_id:pubState.round.id,p_player_id:player.id,p_session_token:sessionToken(),p_choice_player_id:localVote});$('pConfirm').disabled=true;$('pVoteState').textContent='Voto confirmado';}catch(e){alert(e.message)}}
 function parseCsv(t){const first=t.split(/\r?\n/).find(x=>x.trim())||'';const delim=(first.match(/;/g)||[]).length>(first.match(/,/g)||[]).length?';':',';const out=[];let row=[],cell='',q=false;for(let i=0;i<t.length;i++){const c=t[i],n=t[i+1];if(c==='"'&&q&&n==='"'){cell+='"';i++;continue}if(c==='"'){q=!q;continue}if(c===delim&&!q){row.push(cell);cell='';continue}if((c==='\n'||c==='\r')&&!q){if(c==='\r'&&n==='\n')i++;row.push(cell);out.push(row);row=[];cell='';continue}cell+=c}if(cell||row.length){row.push(cell);out.push(row)}return out}
 function normalizeSpotifyUrl(url){let u=url.trim();if(!/^https?:\/\/(open\.spotify\.com|spotify\.link)\//i.test(u))throw new Error('Use um link público do Spotify.');return u}
-async function resolveSpotify(url){const clean=normalizeSpotifyUrl(url);const r=await fetch('/api/spotify?url='+encodeURIComponent(clean));if(!r.ok){let m='Não foi possível identificar a música no Spotify.';try{const x=await r.json();m=x.error||m}catch{}throw new Error(m)}const data=await r.json();if(!data.title||!data.artist)throw new Error('Não foi possível identificar título e artista neste link do Spotify.');return {title:data.title,artist:data.artist,album_art_url:data.album_art_url||'',spotify_url:clean}}
+async function resolveSpotify(url){
+  const clean=normalizeSpotifyUrl(url);
+  const r=await fetch('/api/spotify?url='+encodeURIComponent(clean),{headers:{'Accept':'application/json'}});
+  let data=null;
+  try{data=await r.json()}catch{}
+  if(!r.ok) throw new Error((data&&data.error)||`Não foi possível identificar a música no Spotify (HTTP ${r.status}).`);
+  if(!data?.title||!data?.artist) throw new Error('O Spotify não retornou título e artista para este link.');
+  return {title:data.title,artist:data.artist,album_art_url:data.album_art_url||'',spotify_url:clean}
+}
 async function addSpotifySong(url,owner){const meta=await resolveSpotify(url);if(!meta.artist){throw new Error('O Spotify não forneceu o artista neste link. Use um link de faixa que contenha o artista nos metadados ou configure a API do Spotify no backend.')}await rpc('admin_add_song',{p_game_id:game.id,p_password:adminPassword,p_title:meta.title,p_artist:meta.artist,p_owner:owner,p_album_art_url:meta.album_art_url,p_spotify_url:meta.spotify_url});}
 async function importCsv(file){const rows=parseCsv(await file.text());const h=rows.shift().map(x=>x.trim().toLowerCase());const uidx=h.indexOf('url'),nidx=h.indexOf('nome');if(uidx<0||nidx<0)throw new Error('O CSV precisa ter as colunas url e nome.');let ok=0,errors=[];for(let i=0;i<rows.length;i++){const url=(rows[i][uidx]||'').trim(),owner=(rows[i][nidx]||'').trim();if(!url||!owner)continue;try{await addSpotifySong(url,owner);ok++}catch(e){errors.push(`linha ${i+2}: ${e.message}`)}}alert(`${ok} músicas importadas.${errors.length?'\n\nFalhas:\n'+errors.slice(0,5).join('\n'):''}`);await refreshAdmin()}
 function emojiRain(emoji){const box=$('emojiRain');box.innerHTML='';for(let i=0;i<42;i++){const d=document.createElement('span');d.className='emoji-drop';d.textContent=emoji;d.style.left=Math.random()*100+'%';d.style.animationDelay=(Math.random()*1.8)+'s';d.style.setProperty('--dx',(Math.random()*220-110)+'px');d.style.setProperty('--rot',(Math.random()*900-450)+'deg');box.appendChild(d)}setTimeout(()=>box.innerHTML='',5200)}
@@ -293,5 +301,5 @@ async function boot(){
 if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot,{once:true}); else boot();
 </script>
 <noscript><div style="position:fixed;inset:0;background:#050507;color:#fff;display:grid;place-items:center;padding:24px;text-align:center;font-family:system-ui">Este jogo precisa de JavaScript ativado no navegador.</div></noscript>
-<div id="versionFooter">the ultimate jogo da música · v7.1</div></body>
+</body>
 </html>
