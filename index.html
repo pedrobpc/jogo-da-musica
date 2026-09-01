@@ -588,7 +588,17 @@ async function refreshPublic(){
   }
   const gp=rpcRow(progRes)||{}; gameProgress={played:Number(gp.played_songs||0),total:Number(gp.total_songs||0)};
   const newRound=rRes.data?.[0]||null;
-  if(newRound?.id!==lastPublicRoundId){ localVote=null; revealShown=false; lastPublicRoundId=newRound?.id||null; const saved=game?.id&&newRound?.id?sessionStorage.getItem('jdm_vote_confirmed_'+game.id):null; voteConfirmedRoundId=saved===newRound.id?saved:null; }
+  if(newRound?.id!==lastPublicRoundId){
+    localVote=null;
+    revealShown=false;
+    lastPublicRoundId=newRound?.id||null;
+    if(newRound?.id){
+      const saved=game?.id?sessionStorage.getItem('jdm_vote_confirmed_'+game.id):null;
+      voteConfirmedRoundId=saved===newRound.id?saved:null;
+    }else{
+      voteConfirmedRoundId=null;
+    }
+  }
   pubState.players=pRes.data||[];
   pubState.round=newRound;
   pubState.rankings=rankRes.data||[];
@@ -820,7 +830,12 @@ function renderAdminResult(){const rows=resultRows();$('aResult').innerHTML=rows
 function renderRankAdmin(){const r=adminState.rankings||[];const all=adminState.finalResults||[]; $('rankAdmin').innerHTML=adminState.game?.phase==='lobby'?'<div class="tiny">A partida ainda não começou.</div>':adminState.game?.phase==='final_ranking'||adminState.game?.phase==='finished'?`<div class="rank-list">${(r.length?r:[...all].sort((a,b)=>b.rank-a.rank)).map(x=>`<div class="rank-card"><div class="rank-pos">${x.rank}º</div><div class="rank-name">${esc(((adminState.players||[]).find(p=>p.id===x.player_id)?.avatar_emoji)||'😀')} ${esc(x.player_name||x.name||'')}</div><div class="rank-score">${x.score}<small>acertos</small></div></div>`).join('')}</div>`:''}
 async function refreshAdmin(){if(!adminMode||!game)return; adminState=await rpc('admin_state',{p_game_id:game.id,p_password:adminPassword}); adminState.game=adminState.game; adminState.round=adminState.game.current_round_id?await getRound(adminState.game.current_round_id):null;adminState.players=adminState.players||[];adminState.songs=adminState.songs||[];adminState.rankings=adminState.publicRankings||[];adminState.finalResults=adminState.finalResults||[];try{adminState.scoreboard=rpcRow(await rpc('admin_round_scoreboard',{p_game_id:game.id,p_password:adminPassword}))||null}catch(e){console.debug('scoreboard',e);adminState.scoreboard=null}try{adminState.mappingAudit=rpcRow(await rpc('admin_mapping_audit',{p_game_id:game.id,p_password:adminPassword}))||null}catch(e){console.debug('mapping audit',e);adminState.mappingAudit=null}renderAdmin()}
 async function getRound(id){const {data,error}=await sb.from('rounds').select('*').eq('id',id).single();if(error)throw error;return data}
-async function joinRoom(){try{if(!sb && !(await connect()))return; const code=$('roomCode').value.trim().toUpperCase();const name=$('playerName').value.trim();if(!/^[A-Z]{4,5}$/.test(code)||!name)return alert('Informe um código de 4 ou 5 letras e seu nome.');const g=await rpc('get_game_by_code',{p_code:code});if(!g?.length)return alert('Sala não encontrada.');game={id:g[0].game_id,code:g[0].game_code,title:g[0].title,phase:g[0].phase,round_no:g[0].round_no,current_round_id:g[0].current_round_id,final_reveal_rank:g[0].final_reveal_rank};const p=await rpc('join_game',{p_game_id:game.id,p_name:name,p_session_token:sessionToken(),p_avatar_emoji:selectedAvatar});const p0=rpcRow(p);const playerId=p0?.result_player_id||p0?.player_id||p0?.id;if(!playerId)throw new Error('O Supabase entrou o jogador, mas não retornou o ID do jogador.');player={id:playerId,name:p0?.result_player_name||p0?.player_name||p0?.name||name,avatar_emoji:p0?.result_avatar_emoji||p0?.avatar_emoji||selectedAvatar};localVote=null;updateUrl();setPlayerMode(true);showScreen('playerScreen');await subscribe();await refreshPublic()}catch(e){alert(e.message||'Erro ao entrar na sala.')}}
+async function joinRoom(){try{if(!sb && !(await connect()))return; const code=$('roomCode').value.trim().toUpperCase();const name=$('playerName').value.trim();if(!/^[A-Z]{4,5}$/.test(code)||!name)return alert('Informe um código de 4 ou 5 letras e seu nome.');const g=await rpc('get_game_by_code',{p_code:code});if(!g?.length)return alert('Sala não encontrada.');game={id:g[0].game_id,code:g[0].game_code,title:g[0].title,phase:g[0].phase,round_no:g[0].round_no,current_round_id:g[0].current_round_id,final_reveal_rank:g[0].final_reveal_rank};
+lastPublicRoundId=null;
+localVote=null;
+revealShown=false;
+voteConfirmedRoundId=null;
+const p=await rpc('join_game',{p_game_id:game.id,p_name:name,p_session_token:sessionToken(),p_avatar_emoji:selectedAvatar});const p0=rpcRow(p);const playerId=p0?.result_player_id||p0?.player_id||p0?.id;if(!playerId)throw new Error('O Supabase entrou o jogador, mas não retornou o ID do jogador.');player={id:playerId,name:p0?.result_player_name||p0?.player_name||p0?.name||name,avatar_emoji:p0?.result_avatar_emoji||p0?.avatar_emoji||selectedAvatar};localVote=null;updateUrl();setPlayerMode(true);showScreen('playerScreen');await subscribe();await refreshPublic()}catch(e){alert(e.message||'Erro ao entrar na sala.')}}
 function setSessionMode(mode){
   const inSession=mode==='player'||mode==='admin';
   $('adminBtn').style.display=inSession?'none':'';
