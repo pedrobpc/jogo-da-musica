@@ -112,7 +112,21 @@ let selectedAvatar=localStorage.getItem('jdm_avatar')||'😀';
 let sb=null, channel=null, game=null, player=null, adminPassword='', adminMode=false, localVote=null, ticker=null, autoTimer=null, revealShown=false;
 let mappingPlayers=[], mappingOwners=[];
 let pubState={players:[],round:null,rankings:[],roundResults:[]}, adminState={songs:[],players:[],round:null,game:null,rankings:[],finalResults:[]};
-const $=id=>document.getElementById(id); const clone=x=>JSON.parse(JSON.stringify(x));
+const $=id=>document.getElementById(id);
+function rpcRow(data){ return Array.isArray(data) ? (data[0]||null) : (data||null); }
+function sanitizePublicRound(round){
+  if(!round) return null;
+  const r={...round};
+  if(!r.owner_revealed){
+    delete r.owner_player_id;
+    delete r.revealed_owner;
+    delete r.revealed_owner_player_id;
+    delete r.owner_name;
+    delete r.owner_avatar_emoji;
+  }
+  return r;
+}
+ const clone=x=>JSON.parse(JSON.stringify(x));
 const esc=s=>String(s??'').replace(/[&<>'"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[m]));
 function cfg(){
   const builtinUrl=BUILTIN_SUPABASE_URL;
@@ -279,5 +293,5 @@ async function boot(){
 if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot,{once:true}); else boot();
 </script>
 <noscript><div style="position:fixed;inset:0;background:#050507;color:#fff;display:grid;place-items:center;padding:24px;text-align:center;font-family:system-ui">Este jogo precisa de JavaScript ativado no navegador.</div></noscript>
-</body>
+<div id="versionFooter">the ultimate jogo da música · v7.1</div></body>
 </html>
