@@ -436,6 +436,13 @@
         <div class="avatar-options hidden" id="avatarPicker" aria-label="Opções de avatar"></div>
       </div>
       <div class="spacer"></div><button class="btn" id="joinBtn" style="width:100%">Entrar na sala →</button>
+      <div style="margin-top:12px"><button type="button" class="btn secondary" id="showRecoveryPanel" style="width:100%">Não consegue voltar? Usar código do administrador</button></div>
+      <div id="recoveryPanel" class="hidden" style="margin-top:12px;text-align:left">
+        <p class="tiny">Peça um código ao administrador. Informe o mesmo código da sala e o código de retorno recebido.</p>
+        <div class="field"><label>CÓDIGO DE RETORNO</label><input id="recoveryInput" maxlength="12" placeholder="12 caracteres" autocomplete="one-time-code" autocapitalize="characters"></div>
+        <button type="button" class="btn" id="recoverySubmit" style="width:100%;margin-top:9px">Voltar à partida</button>
+        <div id="recoveryMsg" class="tiny" style="margin-top:8px"></div>
+      </div>
       <div class="tiny" style="margin-top:10px">O código foi criado pelo administrador, também conhecido como o mais belo e engraçado membro da cpi.</div>
     </div>
   </div></div>
@@ -495,7 +502,7 @@
     </div>
     <div class="card" style="margin-top:13px"><div class="eyebrow">RESULTADO</div><div id="aResult" class="muted">Nenhum resultado disponível.</div></div>
   </div>
-  <div id="tab-players" class="tab-pane hidden"><div class="card"><div class="eyebrow">PARTICIPANTES</div><div class="section-title" style="font-size:25px">Mapeamento dos jogadores</div><p class="muted">Para cada música, marque todas as pessoas que são donas dela. Se houver mais de uma, qualquer uma das respostas corretas vale um ponto.</p><div id="mappingGrid" class="mapping-grid" style="grid-template-columns:1fr"></div><div class="actions" style="margin-top:13px"><button class="btn" id="applyMapping">Salvar donos</button></div><div class="hr"></div><div id="aPlayersTable"></div></div></div>
+  <div id="tab-players" class="tab-pane hidden"><div class="card"><div class="eyebrow">PARTICIPANTES</div><div class="section-title" style="font-size:25px">Conexão e retorno dos jogadores</div><p class="muted">“Ativo agora” significa que o aparelho enviou um sinal nos últimos 45 segundos. Em celulares com a tela em segundo plano, o navegador pode pausar os sinais.</p><div id="aPlayersConnections"></div><div class="hr"></div><div class="section-title" style="font-size:22px">Donos das músicas</div><p class="muted">Para cada música, marque todas as pessoas que são donas dela. Qualquer resposta correta vale um ponto.</p><div id="mappingGrid" class="mapping-grid" style="grid-template-columns:1fr"></div><div class="actions" style="margin-top:13px"><button class="btn" id="applyMapping">Salvar donos</button></div><div class="hr"></div><div id="aPlayersTable"></div></div></div>
   <div id="tab-songs" class="tab-pane hidden"><div class="card"><div class="eyebrow">ESCOPO MUSICAL</div><div class="section-title" style="font-size:25px">Músicas da partida</div><div class="grid grid-2" style="margin-top:13px"><div class="field"><label>LINK DO SPOTIFY</label><input id="sSpotify" placeholder="https://open.spotify.com/track/..."/></div><div class="field"><label>DONO(S) DA MÚSICA</label><input id="sOwner" placeholder="Ex.: Ana | Bruno"></div></div><div class="actions" style="margin-top:12px"><button class="btn" id="addSong">Adicionar pelo Spotify</button><button class="btn secondary" id="importBtn">Importar CSV</button><input type="file" id="csvFile" accept=".csv,text/csv" hidden></div><div class="csv-help" style="margin-top:10px">CSV: colunas <b>url</b> e <b>nome</b> (ou <b>donos</b>). Para vários donos, separe os nomes com <b>|</b>. Título, artista e capa vêm do Spotify.</div><div class="hr"></div><div id="aSongsTable"></div></div></div>
   <div id="tab-scoreboard" class="tab-pane hidden"><div class="card"><div class="eyebrow">PLACAR PRIVADO DO ADM</div><div class="section-title" style="font-size:25px">Pontuação rodada a rodada</div><p class="muted">Somente o adm vê esta tela. Cada acerto vale 1 ponto, inclusive quando o jogador vota em si mesmo.</p><div id="adminMappingAudit" style="margin-top:14px"></div><div id="adminCurrentRanking" style="margin-top:18px"></div><div id="adminScoreboard" style="margin-top:18px"></div></div></div>
   <div id="tab-ranking" class="tab-pane hidden"><div class="card"><div class="eyebrow">FINAL DA PARTIDA</div><div class="section-title" style="font-size:25px">Ranking e encerramento</div><p class="muted">Só habilite quando todas as músicas tiverem sido tocadas.</p><div class="actions" style="margin:13px 0"><button class="btn danger" id="endGameBtn">Encerrar partida</button><button class="btn" id="nextRankBtn">Revelar próxima colocação</button><button class="btn secondary" id="exportImgBtn">Exportar imagem</button></div><div id="rankAdmin"></div></div></div>
@@ -505,6 +512,7 @@
 <div class="modal" id="configModal"><div class="modal-card"><div class="eyebrow">CONEXÃO</div><h2 style="margin:6px 0 7px">Conectar ao Supabase</h2><p class="muted">A conexão já está configurada nesta versão.</p><div id="configMsg" class="tiny" style="margin:10px 0"></div><div class="actions" style="margin-top:14px"><button class="btn secondary" id="closeConfig">Fechar</button></div></div></div>
 <div class="modal" id="avatarModal"><div class="modal-card"><div class="eyebrow">AVATAR</div><h2 style="margin:6px 0 7px">Escolha seu emoji</h2><div id="avatarModalPicker" class="pill-row"></div><div class="actions"><button class="btn" id="avatarSave">Confirmar</button></div></div></div>
 <div class="modal" id="exitModal"><div class="modal-card"><div class="eyebrow">SAIR DA SALA</div><h2 style="margin:6px 0">Tem certeza?</h2><p class="muted">Para voltar, use o mesmo aparelho e navegador. O nome sozinho não recupera sua sessão.</p><div class="actions"><button class="btn danger" id="confirmExit">Sair</button><button class="btn secondary" id="cancelExit">Continuar na sala</button></div></div></div>
+<div class="modal" id="recoveryCodeModal"><div class="modal-card"><div class="eyebrow">CÓDIGO DE RETORNO</div><h2 style="margin:6px 0 7px" id="recoveryCodePlayer">Jogador</h2><p class="muted">Passe este código ao jogador. Ele só funciona uma vez e vence em 10 minutos.</p><div id="recoveryCodeValue" style="font-size:30px;font-weight:900;letter-spacing:.13em;text-align:center;padding:16px;border:1px solid var(--line);border-radius:14px;user-select:all"></div><div id="recoveryCodeExpiry" class="tiny" style="text-align:center;margin-top:8px"></div><div class="actions" style="margin-top:16px"><button class="btn" id="copyRecoveryCode">Copiar código</button><button class="btn secondary" id="closeRecoveryCode">Fechar</button></div><div id="recoveryCodeMsg" class="tiny" style="margin-top:9px"></div></div></div>
 <div class="modal" id="monitorModal">
   <div class="modal-card">
     <div class="eyebrow">MONITOR</div>
@@ -534,7 +542,7 @@ const APP_NAME='o derradeiro jogo da música';
 const APP_BUILD='v7.6.0-monitor';
 const AVATARS=['😀', '😎', '🤠', '🥳', '🤩', '😈', '👑', '🥸', '🪩', '🎸', '🎧', '🔥', '💿', '🕺', '💃', '🦄', '👽', '🤖', '🍒', '🌈', '⭐', '🫶', '💜', '❤️', '🐶', '🐱', '🦊', '🐸', '🐵', '🐼', '🐻', '🐨', '🐯', '🦁', '🐷', '🐮', '🐧', '🦉', '🦋', '🐢', '🐙', '🦈', '🦥', '🦦'];
 let selectedAvatar=localStorage.getItem('jdm_avatar')||'😀';
-let sb=null, channel=null, game=null, player=null, adminPassword='', adminMode=false, monitorMode=false, localVote=null, ticker=null, autoTimer=null, revealShown=false;
+let sb=null, channel=null, game=null, player=null, adminPassword='', adminMode=false, monitorMode=false, localVote=null, ticker=null, autoTimer=null, revealShown=false, playerPresenceTimer=null, adminConnectionsTimer=null, heartbeatBusy=false;
 let lastPublicRoundId=null, voteConfirmedRoundId=null, publicProgress={answered:0,total:0,missing_players:[]}, progressTimer=null, gameProgress={played:0,total:0};
 let monitorRoundPeople=[], monitorTomatoRoundId=null, monitorRankRevealSeen=new Set();
 let introShownGameId=null, adminBusy=false;
@@ -569,6 +577,18 @@ function cfg(){
 function setConn(on,msg){$('connDot').className='dot '+(on?'on':'off');$('connText').textContent=msg}
 function showScreen(id){document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active'));$(id).classList.add('active');const chip=$('roomChip');if(chip){const show=!!game&&id!=='homeScreen';chip.classList.toggle('hidden',!show);$('roomChipCode').textContent=show?(game.code||''):'';}window.scrollTo({top:0,behavior:'smooth'})}
 function sessionToken(){let x=localStorage.getItem(PLAYER_KEY); if(!x){x=crypto.randomUUID();localStorage.setItem(PLAYER_KEY,x)} return x}
+function stopPlayerPresence(){clearInterval(playerPresenceTimer);playerPresenceTimer=null;heartbeatBusy=false}
+async function sendPlayerPresence(){
+  if(!player||!game||!sb||document.visibilityState==='hidden'||heartbeatBusy)return;
+  heartbeatBusy=true;
+  try{
+    await rpc('player_heartbeat',{p_player_id:player.id,p_session_token:sessionToken()});
+  }catch(e){
+    if(String(e?.message||e).toLowerCase().includes('sessão foi substituída')) $('pMsg').textContent='Esta sessão foi substituída. Use o código mais recente do administrador para voltar.';
+    console.debug('player heartbeat',e);
+  }finally{heartbeatBusy=false}
+}
+function startPlayerPresence(){stopPlayerPresence();sendPlayerPresence();playerPresenceTimer=setInterval(sendPlayerPresence,15000)}
 let supabaseLoadPromise=null;
 async function loadSupabase(){
   if(window.supabase?.createClient) return true;
@@ -861,7 +881,7 @@ function renderAdmin(){
   if(selectedNextSongId && !left.some(s=>s.id===selectedNextSongId))selectedNextSongId=null;
   if(!selectedNextSongId && left.length)selectedNextSongId=left[0].id;
   $('songSelect').innerHTML=left.length?left.map(s=>`<option value="${s.id}" ${s.id===selectedNextSongId?'selected':''}>${esc(s.title)} — ${esc(s.artist)}</option>`).join(''):'<option value="">Nenhuma música disponível</option>';
-  renderSongPreview();renderPlayersTable();renderSongsTable();renderRankAdmin();renderMappingAudit();renderScoreboardAdmin();
+  renderSongPreview();renderPlayersTable();renderConnectionsTable();renderSongsTable();renderRankAdmin();renderMappingAudit();renderScoreboardAdmin();
   const r=a.round;
   if(!r){$('aRound').textContent='Nenhuma rodada';$('aCurrentSongPreview').innerHTML='<div class="tiny">Nenhuma música em reprodução.</div>';timerUI('aTimer',null);$('aProgressText').textContent=`${gameProgressPercent()}% concluído`;$('aTimeProgress').style.width='0%';$('aTimeText').textContent='—';$('aMissing').innerHTML='<div class="tiny">Aguardando o início da próxima rodada.</div>';return}
   $('aRound').textContent=`Rodada ${r.number} de ${gameProgress.total||'—'}`;
@@ -893,6 +913,44 @@ function renderMapping(){
 }
 function setupDrag(id,arr,type){const box=$(id);if(!box)return;let dragged=null;box.querySelectorAll('.mapping-item').forEach(el=>{el.ondragstart=()=>{dragged=el;el.classList.add('dragging')};el.ondragend=()=>{el.classList.remove('dragging');dragged=null};el.ondragover=e=>{e.preventDefault();el.classList.add('over')};el.ondragleave=()=>el.classList.remove('over');el.ondrop=e=>{e.preventDefault();el.classList.remove('over');if(!dragged||dragged===el)return;const from=[...box.children].indexOf(dragged),to=[...box.children].indexOf(el);if(from<0||to<0)return;const v=arr.splice(from,1)[0];arr.splice(to,0,v);renderMapping();}})}
 function renderPlayersTable(){const p=adminState.players||[];$('aPlayersTable').innerHTML=p.length?`<div class="table-wrap"><table class="table"><thead><tr><th>Avatar</th><th>Nome</th><th>Entrou</th></tr></thead><tbody>${p.map(x=>`<tr><td style="font-size:22px">${esc(x.avatar_emoji||'😀')}</td><td><b>${esc(x.name)}</b></td><td>${new Date(x.joined_at).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}</td></tr>`).join('')}</tbody></table></div>`:'<div class="tiny">Nenhum jogador.</div>';renderMapping()}
+function connectionAge(lastSeen){
+  if(!lastSeen)return 'Nenhum sinal recebido ainda';
+  const seconds=Math.max(0,Math.floor((Date.now()-new Date(lastSeen).getTime())/1000));
+  if(seconds<60)return 'Sinal há '+seconds+' s';
+  const minutes=Math.floor(seconds/60);
+  if(minutes<60)return 'Sinal há '+minutes+' min';
+  return 'Último sinal '+new Date(lastSeen).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+}
+function renderConnectionsTable(){
+  const rows=adminState.connections||[];
+  $('aPlayersConnections').innerHTML=rows.length?`<div class="table-wrap"><table class="table"><thead><tr><th>Jogador</th><th>Conexão</th><th>Último sinal</th><th>Ação</th></tr></thead><tbody>${rows.map(x=>`<tr><td><b>${esc(x.avatar_emoji||'😀')} ${esc(x.name)}</b></td><td><span class="tag" style="${x.is_online?'color:#86efac;border-color:#26834b':'color:#fbbf24;border-color:#8a6422'}">${x.is_online?'Ativo agora':(x.last_seen_at?'Sem sinal recente':'Aguardando primeiro sinal')}</span></td><td>${esc(connectionAge(x.last_seen_at))}</td><td><button class="btn secondary" data-recovery-player="${esc(x.player_id)}">Gerar código</button></td></tr>`).join('')}</tbody></table></div>`:'<div class="tiny">Nenhum jogador entrou nesta partida.</div>';
+  document.querySelectorAll('[data-recovery-player]').forEach(b=>b.onclick=()=>issuePlayerRecoveryCode(b.dataset.recoveryPlayer));
+}
+async function issuePlayerRecoveryCode(playerId){
+  const p=(adminState.players||[]).find(x=>String(x.id)===String(playerId));
+  if(!p)return;
+  try{
+    const result=rpcRow(await rpc('admin_issue_player_recovery_code',{p_game_id:game.id,p_password:adminPassword,p_player_id:playerId}))||{};
+    if(!result.recovery_code)throw new Error('O código não foi retornado pelo banco.');
+    $('recoveryCodePlayer').textContent=(p.avatar_emoji||'😀')+' '+p.name;
+    $('recoveryCodeValue').textContent=result.recovery_code;
+    $('recoveryCodeExpiry').textContent='Válido até '+new Date(result.expires_at).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})+'. Uso único.';
+    $('recoveryCodeMsg').textContent='Passe o código ao jogador. Um novo código invalida o anterior.';
+    $('recoveryCodeModal').classList.add('show');
+  }catch(e){alert(e.message||'Não foi possível gerar o código.')}
+}
+async function refreshPlayerConnections(){
+  if(!adminMode||!game)return;
+  try{
+    adminState.connections=await rpc('admin_player_connections',{p_game_id:game.id,p_password:adminPassword})||[];
+    renderConnectionsTable();
+  }catch(e){console.debug('player connections',e)}
+}
+function startAdminConnectionsPolling(){
+  clearInterval(adminConnectionsTimer);
+  refreshPlayerConnections();
+  adminConnectionsTimer=setInterval(refreshPlayerConnections,12000);
+}
 function renderSongsTable(){const songs=adminState.songs||[];const html=songs.map((x,i)=>'<div class="song-row" draggable="'+(x.used?'false':'true')+'" data-song-id="'+esc(x.id)+'"><div class="song-order">'+(i+1)+'</div><div>'+(x.album_art_url?'<img class="song-thumb" src="'+esc(x.album_art_url)+'">':'<div class="song-thumb"></div>')+'</div><div class="song-meta"><b>'+esc(x.title)+'</b><span>'+esc(x.artist)+' • '+esc(ownerDisplay(x))+'</span></div><div class="song-status"><span class="tag">'+(x.used?'tocada':'disponível')+'</span></div><div class="song-actions">'+(x.used?'<button class="btn good" data-restore-song="'+esc(x.id)+'">Disponibilizar</button>':'<button class="btn danger" data-del-song="'+esc(x.id)+'">Excluir</button>')+'</div></div>').join('');$('aSongsTable').innerHTML=songs.length?'<div class="song-list" id="songList">'+html+'</div><div class="tiny" style="margin-top:8px">Arraste as músicas para definir a sequência da partida.</div>':'<div class="tiny">Nenhuma música cadastrada.</div>';setupSongDrag();document.querySelectorAll('[data-del-song]').forEach(b=>b.onclick=async()=>{if(!confirm('Excluir esta música definitivamente?'))return;try{await rpc('admin_delete_song',{p_game_id:game.id,p_password:adminPassword,p_song_id:b.dataset.delSong});await refreshAdmin()}catch(e){alert(e.message)}});document.querySelectorAll('[data-restore-song]').forEach(b=>b.onclick=async()=>{try{await rpc('admin_restore_song',{p_game_id:game.id,p_password:adminPassword,p_song_id:b.dataset.restoreSong});await refreshAdmin()}catch(e){alert(e.message)}})}
 function setupSongDrag(){const box=$('songList');if(!box)return;let dragged=null;box.querySelectorAll('.song-row[draggable="true"]').forEach(el=>{el.ondragstart=()=>{dragged=el;el.classList.add('dragging')};el.ondragend=()=>{el.classList.remove('dragging');dragged=null};el.ondragover=e=>e.preventDefault();el.ondrop=async e=>{e.preventDefault();if(!dragged||dragged===el)return;const from=[...box.children].indexOf(dragged),to=[...box.children].indexOf(el);const arr=[...box.querySelectorAll('.song-row')].map(x=>x.dataset.songId);const v=arr.splice(from,1)[0];arr.splice(to,0,v);try{await rpc('admin_reorder_songs',{p_game_id:game.id,p_password:adminPassword,p_song_ids:arr});await refreshAdmin()}catch(err){alert(err.message)}}})}
 function renderMappingAudit(){
@@ -946,15 +1004,38 @@ function renderScoreboardAdmin(){
 
 function renderAdminResult(){const rows=resultRows();$('aResult').innerHTML=rows.length?rows.map(x=>`${esc(x.name)}: <b>${x.votes}</b>`).join(' • '):'Nenhum resultado disponível.'}
 function renderRankAdmin(){const r=adminState.rankings||[];const all=adminState.finalResults||[]; $('rankAdmin').innerHTML=adminState.game?.phase==='lobby'?'<div class="tiny">A partida ainda não começou.</div>':adminState.game?.phase==='final_ranking'||adminState.game?.phase==='finished'?`<div class="rank-list">${(r.length?r:[...all].sort((a,b)=>b.rank-a.rank)).map(x=>`<div class="rank-card"><div class="rank-pos">${x.rank}º</div><div class="rank-name">${esc(((adminState.players||[]).find(p=>p.id===x.player_id)?.avatar_emoji)||'😀')} ${esc(x.player_name||x.name||'')}</div><div class="rank-score">${x.score}<small>acertos</small></div></div>`).join('')}</div>`:''}
-async function refreshAdmin(){if(!adminMode||!game)return; adminState=await rpc('admin_state',{p_game_id:game.id,p_password:adminPassword}); adminState.game=adminState.game; adminState.round=adminState.game.current_round_id?await getRound(adminState.game.current_round_id):null;adminState.players=adminState.players||[];adminState.songs=adminState.songs||[];adminState.rankings=adminState.publicRankings||[];adminState.finalResults=adminState.finalResults||[];try{adminState.scoreboard=rpcRow(await rpc('admin_round_scoreboard',{p_game_id:game.id,p_password:adminPassword}))||null}catch(e){console.debug('scoreboard',e);adminState.scoreboard=null}try{adminState.mappingAudit=rpcRow(await rpc('admin_mapping_audit',{p_game_id:game.id,p_password:adminPassword}))||null}catch(e){console.debug('mapping audit',e);adminState.mappingAudit=null}renderAdmin()}
+async function refreshAdmin(){if(!adminMode||!game)return;const connections=adminState.connections||[];adminState=await rpc('admin_state',{p_game_id:game.id,p_password:adminPassword});adminState.connections=connections;adminState.round=adminState.game.current_round_id?await getRound(adminState.game.current_round_id):null;adminState.players=adminState.players||[];adminState.songs=adminState.songs||[];adminState.rankings=adminState.publicRankings||[];adminState.finalResults=adminState.finalResults||[];try{adminState.scoreboard=rpcRow(await rpc('admin_round_scoreboard',{p_game_id:game.id,p_password:adminPassword}))||null}catch(e){console.debug('scoreboard',e);adminState.scoreboard=null}try{adminState.mappingAudit=rpcRow(await rpc('admin_mapping_audit',{p_game_id:game.id,p_password:adminPassword}))||null}catch(e){console.debug('mapping audit',e);adminState.mappingAudit=null}renderAdmin()}
 async function getRound(id){const {data,error}=await sb.from('rounds').select('*').eq('id',id).single();if(error)throw error;return data}
-async function joinRoom(){try{if(!sb && !(await connect()))return; const code=$('roomCode').value.trim().toUpperCase();const name=$('playerName').value.trim();if(!/^[A-Z]{4,5}$/.test(code)||!name)return alert('Informe um código de 4 ou 5 letras e seu nome.');const g=await rpc('get_game_by_code',{p_code:code});if(!g?.length)return alert('Sala não encontrada.');game={id:g[0].game_id,code:g[0].game_code,title:g[0].title,phase:g[0].phase,round_no:g[0].round_no,current_round_id:g[0].current_round_id,final_reveal_rank:g[0].final_reveal_rank};
+async function joinRoom(){try{if(!sb && !(await connect()))return; const code=$('roomCode').value.trim().toUpperCase();const name=$('playerName').value.trim();if(!/^[A-Z0-9]{4,5}$/.test(code)||!name)return alert('Informe um código de sala de 4 ou 5 caracteres e seu nome.');const g=await rpc('get_game_by_code',{p_code:code});if(!g?.length)return alert('Sala não encontrada.');game={id:g[0].game_id,code:g[0].game_code,title:g[0].title,phase:g[0].phase,round_no:g[0].round_no,current_round_id:g[0].current_round_id,final_reveal_rank:g[0].final_reveal_rank};
 lastPublicRoundId=null;
 localVote=null;
 revealShown=false;
 voteConfirmedRoundId=null;
-const p=await rpc('join_game',{p_game_id:game.id,p_name:name,p_session_token:sessionToken(),p_avatar_emoji:selectedAvatar});const p0=rpcRow(p);const playerId=p0?.result_player_id||p0?.player_id||p0?.id;if(!playerId)throw new Error('O Supabase entrou o jogador, mas não retornou o ID do jogador.');player={id:playerId,name:p0?.result_player_name||p0?.player_name||p0?.name||name,avatar_emoji:p0?.result_avatar_emoji||p0?.avatar_emoji||selectedAvatar};localVote=null;updateUrl();setPlayerMode(true);showScreen('playerScreen');await subscribe();await refreshPublic()}catch(e){alert(e.message||'Erro ao entrar na sala.')}}
+const p=await rpc('join_game',{p_game_id:game.id,p_name:name,p_session_token:sessionToken(),p_avatar_emoji:selectedAvatar});const p0=rpcRow(p);const playerId=p0?.result_player_id||p0?.player_id||p0?.id;if(!playerId)throw new Error('O Supabase entrou o jogador, mas não retornou o ID do jogador.');player={id:playerId,name:p0?.result_player_name||p0?.player_name||p0?.name||name,avatar_emoji:p0?.result_avatar_emoji||p0?.avatar_emoji||selectedAvatar};localVote=null;updateUrl();setPlayerMode(true);showScreen('playerScreen');await subscribe();await refreshPublic();startPlayerPresence()}catch(e){alert(e.message||'Erro ao entrar na sala.')}}
 
+async function claimReturnSession(){
+  const box=$('recoveryMsg');box.textContent='';
+  try{
+    if(!sb && !(await connect()))return;
+    const code=$('roomCode').value.trim().toUpperCase();
+    const recovery=$('recoveryInput').value.trim().toUpperCase();
+    if(!/^[A-Z0-9]{4,5}$/.test(code)){box.textContent='Informe o código da sala.';return}
+    if(!/^[0-9A-F]{12}$/.test(recovery)){box.textContent='O código de retorno tem 12 caracteres.';return}
+    const token=sessionToken();
+    const p=rpcRow(await rpc('claim_player_session',{p_game_code:code,p_recovery_code:recovery,p_session_token:token}));
+    if(!p?.result_player_id)throw new Error('Código de retorno inválido, vencido ou já utilizado.');
+    game={id:p.result_game_id,code:p.result_game_code};
+    player={id:p.result_player_id,name:p.result_player_name,avatar_emoji:p.result_avatar_emoji||'😀'};
+    selectedAvatar=player.avatar_emoji;
+    localStorage.setItem('jdm_avatar',selectedAvatar);
+    $('selectedAvatarPreview').textContent=selectedAvatar;
+    $('recoveryInput').value='';
+    $('recoveryPanel').classList.add('hidden');
+    localVote=null;lastPublicRoundId=null;voteConfirmedRoundId=null;revealShown=false;
+    setPlayerMode(true);updateUrl();showScreen('playerScreen');
+    await subscribe();await refreshPublic();startPlayerPresence();
+  }catch(e){box.textContent=e.message||'Não foi possível voltar à partida.'}
+}
 function monitorRoomCode(){return game?.code||''}
 function monitorEscList(arr){
   return (arr||[]).map(x=>typeof x==='string'?x:(x?.player_name||x?.name||'')).filter(Boolean);
@@ -1124,7 +1205,7 @@ function startTicker(){
     }
   },250)
 }
-async function createOrEnterAdmin(){try{if(!sb && !(await connect()))return;const mode=$('adminMode').value,pass=$('adminPassword').value; if(pass.length<6)return alert('Use uma senha de pelo menos 6 caracteres.');let g;if(mode==='create'){const data=await rpc('create_game',{p_title:$('adminTitle').value.trim()||'O Derradeiro Jogo da Música — edição anual',p_password:pass});if(!data?.[0]?.game_id||!data?.[0]?.game_code)throw new Error('A nova sala foi criada, mas o Supabase não retornou seus dados.');if(channel){await sb.removeChannel(channel);channel=null}clearInterval(progressTimer);progressTimer=null;selectedNextSongId=null;mappingPlayers=[];mappingOwners=[];lastPublicRoundId=null;voteConfirmedRoundId=null;finalRainSeenRanks=new Set();pubState={players:[],round:null,rankings:[],roundResults:[]};adminState={songs:[],players:[],round:null,game:null,rankings:[],finalResults:[],scoreboard:null,mappingAudit:null};game={id:data[0].game_id,code:data[0].game_code};adminPassword=pass}else{const code=$('adminCode').value.trim().toUpperCase();const q=await rpc('get_game_by_code',{p_code:code});if(!q?.length)return alert('Sala não encontrada.');game={id:q[0].game_id,code:q[0].game_code};if(!(await rpc('verify_admin',{p_game_id:game.id,p_password:pass})))return alert('Senha administrativa inválida.');adminPassword=pass} adminMode=true;setSessionMode('admin');updateUrl();$('adminModal').classList.remove('show');showScreen('adminScreen');await subscribe();await refreshPublic();await refreshAdmin()}catch(e){$('adminMsg').textContent=e.message||'Erro administrativo.'}}
+async function createOrEnterAdmin(){try{if(!sb && !(await connect()))return;const mode=$('adminMode').value,pass=$('adminPassword').value; if(pass.length<6)return alert('Use uma senha de pelo menos 6 caracteres.');let g;if(mode==='create'){const data=await rpc('create_game',{p_title:$('adminTitle').value.trim()||'O Derradeiro Jogo da Música — edição anual',p_password:pass});if(!data?.[0]?.game_id||!data?.[0]?.game_code)throw new Error('A nova sala foi criada, mas o Supabase não retornou seus dados.');if(channel){await sb.removeChannel(channel);channel=null}clearInterval(progressTimer);progressTimer=null;selectedNextSongId=null;mappingPlayers=[];mappingOwners=[];lastPublicRoundId=null;voteConfirmedRoundId=null;finalRainSeenRanks=new Set();pubState={players:[],round:null,rankings:[],roundResults:[]};adminState={songs:[],players:[],round:null,game:null,rankings:[],finalResults:[],scoreboard:null,mappingAudit:null,connections:[]};game={id:data[0].game_id,code:data[0].game_code};adminPassword=pass}else{const code=$('adminCode').value.trim().toUpperCase();const q=await rpc('get_game_by_code',{p_code:code});if(!q?.length)return alert('Sala não encontrada.');game={id:q[0].game_id,code:q[0].game_code};if(!(await rpc('verify_admin',{p_game_id:game.id,p_password:pass})))return alert('Senha administrativa inválida.');adminPassword=pass} adminMode=true;setSessionMode('admin');updateUrl();$('adminModal').classList.remove('show');showScreen('adminScreen');await subscribe();await refreshPublic();await refreshAdmin();startAdminConnectionsPolling()}catch(e){$('adminMsg').textContent=e.message||'Erro administrativo.'}}
 async function startRound(){
   if(adminBusy)return;
   adminBusy=true;renderAdmin();
@@ -1176,12 +1257,13 @@ async function closeAdminSession(){
   if(!second)return;
   try{
     $('confirmCloseSession').disabled=true;
+    clearInterval(adminConnectionsTimer);adminConnectionsTimer=null;
     if(channel){await sb.removeChannel(channel);channel=null}
     clearInterval(progressTimer);progressTimer=null;
     await rpc('admin_close_session',{p_game_id:game.id,p_password:adminPassword});
     adminMode=false;adminPassword='';player=null;localVote=null;game=null;finalRainSeenRanks=new Set();
     pubState={players:[],round:null,rankings:[],roundResults:[]};
-    adminState={songs:[],players:[],round:null,game:null,rankings:[],finalResults:[],scoreboard:null,mappingAudit:null};
+    adminState={songs:[],players:[],round:null,game:null,rankings:[],finalResults:[],scoreboard:null,mappingAudit:null,connections:[]};
     $('closeSessionModal').classList.remove('show');setSessionMode('home');showScreen('homeScreen');history.replaceState({},'',location.pathname);
     alert('Sessão encerrada e removida da base.');
   }catch(e){
@@ -1361,14 +1443,16 @@ $('monitorBtn').onclick=()=>{$('monitorCode').value=roomFromUrl();$('monitorModa
 $('closeMonitor').onclick=()=>$('monitorModal').classList.remove('show');
 $('monitorGo').onclick=enterMonitor;
 $('monitorCode').oninput=()=>{$('monitorCode').value=$('monitorCode').value.replace(/[^a-z]/gi,'').toUpperCase().slice(0,5)};
-$('joinBtn').onclick=joinRoom;$('roomCode').value=roomFromUrl();$('roomCode').oninput=()=>{$('roomCode').value=$('roomCode').value.replace(/[^a-z]/gi,'').toUpperCase().slice(0,5)};
+$('joinBtn').onclick=joinRoom;$('roomCode').value=roomFromUrl();$('roomCode').oninput=()=>{$('roomCode').value=$('roomCode').value.replace(/[^a-z0-9]/gi,'').toUpperCase().slice(0,5)};$('recoveryInput').oninput=()=>{$('recoveryInput').value=$('recoveryInput').value.replace(/[^a-f0-9]/gi,'').toUpperCase().slice(0,12)};$('showRecoveryPanel').onclick=()=>{$('recoveryPanel').classList.toggle('hidden');if(!$('recoveryPanel').classList.contains('hidden'))$('recoveryInput').focus()};$('recoverySubmit').onclick=claimReturnSession;
 $('adminBtn').onclick=()=>{$('adminModal').classList.add('show');$('adminMode').dispatchEvent(new Event('change'))};$('closeAdmin').onclick=()=>$('adminModal').classList.remove('show');$('adminMode').onchange=()=>{const create=$('adminMode').value==='create';$('adminCodeWrap').classList.toggle('hidden',create);$('adminTitleWrap').classList.toggle('hidden',!create);if(create)$('adminTitle').value=`${APP_NAME} — edição ${APP_YEAR}`};$('adminGo').onclick=createOrEnterAdmin;
 $('startBtn').onclick=startRound;$('plus15').onclick=plus15;$('endBtn').onclick=endRound;$('revealOwnerBtn').onclick=revealOwner;$('pConfirm').onclick=vote;$('songSelect').onchange=()=>{selectedNextSongId=$('songSelect').value||null;renderSongPreview()};
 $('addSong').onclick=async()=>{try{const url=$('sSpotify').value.trim(),owner=$('sOwner').value.trim();if(!url||!owner)return alert('Informe o link do Spotify e o(s) dono(s). Use | para separar vários nomes.');await addSpotifySong(url,owner);$('sOwner').value='';$('sSpotify').value='';await refreshAdmin()}catch(e){alert(e.message)}};
 $('importBtn').onclick=()=>$('csvFile').click();$('csvFile').onchange=async e=>{const input=e.target,file=input.files?.[0];if(!file)return;try{await importCsv(file)}catch(err){alert(err.message)}finally{input.value=''}};
 $('copyRoom').onclick=async()=>{try{await navigator.clipboard.writeText(game.code);$('copyRoom').textContent='Copiado ✓';setTimeout(()=>$('copyRoom').textContent='Copiar código',1000)}catch{alert(game.code)}};
 $('applyMapping').onclick=async()=>{const button=$('applyMapping');if(button.disabled)return;const oldText=button.textContent;button.disabled=true;button.textContent='Salvando...';try{const mappings=[...document.querySelectorAll('[data-map-owner-song]')].map(box=>({song_id:box.dataset.mapOwnerSong,owner_player_ids:[...box.querySelectorAll('input[type="checkbox"]:checked')].map(input=>input.value)}));await rpc('admin_map_song_owners',{p_game_id:game.id,p_password:adminPassword,p_mappings:mappings});await refreshAdmin();const a=adminState.mappingAudit;if(a&&(Number(a.unmapped_songs||0)>0||Number(a.invalid_mapped_songs||0)>0))alert('Mapeamento salvo. Ainda há '+Number(a.unmapped_songs||0)+' música(s) sem dono associado.');else alert('Donos salvos e conferidos no banco.')}catch(e){alert(e.message)}finally{button.disabled=false;button.textContent=oldText}};
-$('exitBtn').onclick=()=>{$('exitModal').classList.add('show')};$('cancelExit').onclick=()=>$('exitModal').classList.remove('show');$('confirmExit').onclick=()=>{ $('exitModal').classList.remove('show');clearInterval(progressTimer);progressTimer=null;adminMode=false;adminPassword='';player=null;localVote=null;voteConfirmedRoundId=null;game=null;setSessionMode('home');showScreen('homeScreen');history.replaceState({},'',location.pathname)};$('closeSessionBtn').onclick=()=>{if(!game)return;$('closeSessionMsg').textContent='';$('confirmCloseSession').disabled=false;$('closeSessionModal').classList.add('show')};$('cancelCloseSession').onclick=()=>$('closeSessionModal').classList.remove('show');$('confirmCloseSession').onclick=closeAdminSession;
+$('exitBtn').onclick=()=>{$('exitModal').classList.add('show')};$('cancelExit').onclick=()=>$('exitModal').classList.remove('show');$('confirmExit').onclick=()=>{ $('exitModal').classList.remove('show');clearInterval(progressTimer);progressTimer=null;stopPlayerPresence();clearInterval(adminConnectionsTimer);adminConnectionsTimer=null;adminMode=false;adminPassword='';player=null;localVote=null;voteConfirmedRoundId=null;game=null;setSessionMode('home');showScreen('homeScreen');history.replaceState({},'',location.pathname)};$('closeSessionBtn').onclick=()=>{if(!game)return;$('closeSessionMsg').textContent='';$('confirmCloseSession').disabled=false;$('closeSessionModal').classList.add('show')};$('cancelCloseSession').onclick=()=>$('closeSessionModal').classList.remove('show');$('confirmCloseSession').onclick=closeAdminSession;
+$('closeRecoveryCode').onclick=()=>{$('recoveryCodeModal').classList.remove('show');$('recoveryCodeValue').textContent='';$('recoveryCodeMsg').textContent=''};$('copyRecoveryCode').onclick=async()=>{const code=$('recoveryCodeValue').textContent;if(!code)return;try{await navigator.clipboard.writeText(code);$('recoveryCodeMsg').textContent='Código copiado.'}catch{$('recoveryCodeMsg').textContent='Não foi possível copiar. Anote o código exibido.'}};
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)sendPlayerPresence()});window.addEventListener('online',sendPlayerPresence);
 $('endGameBtn').onclick=()=>{$('confirmEndModal').classList.add('show');$('endCheck').checked=false;$('endPhrase').value='';$('confirmEndGame').disabled=true};$('cancelEndGame').onclick=()=>$('confirmEndModal').classList.remove('show');function syncEndButton(){$('confirmEndGame').disabled=!($('endCheck').checked&&$('endPhrase').value.trim().toUpperCase()==='ENCERRAR')}$('endCheck').onchange=syncEndButton;$('endPhrase').oninput=syncEndButton;$('confirmEndGame').onclick=async()=>{ $('confirmEndModal').classList.remove('show');await endGame()};$('nextRankBtn').onclick=nextRank;$('exportImgBtn').onclick=exportImage;
 document.querySelectorAll('.admin-tab').forEach(b=>b.onclick=()=>{document.querySelectorAll('.admin-tab').forEach(x=>x.classList.remove('active'));b.classList.add('active');document.querySelectorAll('.tab-pane').forEach(x=>x.classList.add('hidden'));$('tab-'+b.dataset.tab).classList.remove('hidden');if(b.dataset.tab==='players')renderMapping()});
 async function boot(){
